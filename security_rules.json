@@ -1,0 +1,42 @@
+[
+  {
+    "id": "HLS-WEB-001",
+    "name": "Missing Content Security Policy (CSP)",
+    "header": "Content-Security-Policy",
+    "severity": "HIGH",
+    "cwe": "CWE-1021",
+    "remediation": "default-src 'self'; script-src 'self'; object-src 'none';"
+  },
+  {
+    "id": "HLS-WEB-002",
+    "name": "Missing HTTP Strict Transport Security (HSTS)",
+    "header": "Strict-Transport-Security",
+    "severity": "HIGH",
+    "cwe": "CWE-319",
+    "remediation": "max-age=31536000; includeSubDomains; preload"
+  },
+  {
+    "id": "HLS-WEB-003",
+    "name": "Missing Anti-Clickjacking Defense",
+    "header": "X-Frame-Options",
+    "severity": "MEDIUM",
+    "cwe": "CWE-1021",
+    "remediation": "DENY"
+  },
+  {
+    "id": "HLS-WEB-004",
+    "name": "Missing MIME Sniffing Protection",
+    "header": "X-Content-Type-Options",
+    "severity": "LOW",
+    "cwe": "CWE-704",
+    "remediation": "nosniff"
+  },
+  {
+    "id": "HLS-WEB-005",
+    "name": "Server Fingerprinting Disclosure",
+    "header": "Server",
+    "severity": "LOW",
+    "cwe": "CWE-200",
+    "remediation": "Remove Server header in reverse proxy configuration"
+  }
+]

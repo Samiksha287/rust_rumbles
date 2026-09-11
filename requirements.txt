@@ -1,0 +1,8 @@
+# HELIOS Autonomous Security Engineer
+# Built with Python standard library (http.server, urllib, json, re)
+# Zero mandatory external wheels required!
+# Optional packages for development and extended features:
+python-dotenv>=1.0.0
+requests>=2.31.0
+matplotlib>=3.8.0
+pillow>=10.0.0

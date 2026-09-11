@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HELIOS — AI-Powered Autonomous Security Engineer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Inter', system-ui, sans-serif; transition: background-color 0.3s ease, color 0.3s ease; }
+
+    /* Dark Mode Glassmorphism */
+    .dark body { background: #030712; color: #f1f5f9; }
+    .dark .glass { background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(24px) saturate(1.4); -webkit-backdrop-filter: blur(24px) saturate(1.4); border: 1px solid rgba(148, 163, 184, 0.08); }
+    .dark .glass-strong { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(32px); -webkit-backdrop-filter: blur(32px); border: 1px solid rgba(148, 163, 184, 0.12); }
+    .dark .glass-card { background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(148, 163, 184, 0.08); transition: all 0.25s ease; }
+    .dark .glass-card:hover { background: rgba(15, 23, 42, 0.7); border-color: rgba(6, 182, 212, 0.25); box-shadow: 0 10px 30px rgba(6, 182, 212, 0.06); }
+    .dark .glass-inner { background: rgba(3, 7, 18, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(148, 163, 184, 0.06); }
+    .dark .glass-input { background: rgba(3, 7, 18, 0.75); border: 1px solid rgba(148, 163, 184, 0.15); color: #f1f5f9; }
+    .dark .glow-cyan { box-shadow: 0 0 20px rgba(6, 182, 212, 0.15); }
+
+    /* Light Mode Glassmorphism */
+    .light body { background: #f8fafc; color: #0f172a; }
+    .light .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(24px) saturate(1.2); -webkit-backdrop-filter: blur(24px) saturate(1.2); border: 1px solid rgba(203, 213, 225, 0.6); }
+    .light .glass-strong { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(32px); -webkit-backdrop-filter: blur(32px); border: 1px solid rgba(203, 213, 225, 0.8); }
+    .light .glass-card { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(203, 213, 225, 0.5); transition: all 0.25s ease; }
+    .light .glass-card:hover { background: rgba(255, 255, 255, 0.95); border-color: rgba(14, 165, 233, 0.4); box-shadow: 0 10px 30px rgba(14, 165, 233, 0.1); }
+    .light .glass-inner { background: rgba(241, 245, 249, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(203, 213, 225, 0.6); }
+    .light .glass-input { background: #ffffff; border: 1px solid #cbd5e1; color: #0f172a; }
+    .light .glow-cyan { box-shadow: 0 0 20px rgba(14, 165, 233, 0.12); }
+
+    /* Ambient Background Orbs */
+    .ambient-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; overflow: hidden; }
+    .ambient-orb { position: absolute; border-radius: 50%; filter: blur(120px); animation: float 20s ease-in-out infinite; }
+    .dark .ambient-orb.cyan { background: radial-gradient(circle, #06b6d4, transparent 70%); width: 500px; height: 500px; top: -10%; left: 5%; opacity: 0.12; }
+    .dark .ambient-orb.purple { background: radial-gradient(circle, #8b5cf6, transparent 70%); width: 450px; height: 450px; bottom: -10%; right: 5%; opacity: 0.09; animation-delay: -7s; }
+    .light .ambient-orb.cyan { background: radial-gradient(circle, #38bdf8, transparent 70%); width: 500px; height: 500px; top: -10%; left: 5%; opacity: 0.18; }
+    .light .ambient-orb.purple { background: radial-gradient(circle, #a855f7, transparent 70%); width: 450px; height: 450px; bottom: -10%; right: 5%; opacity: 0.12; animation-delay: -7s; }
+    @keyframes float { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(25px, -20px); } }
+
+    /* SVG Progress Ring */
+    .ring-track { fill: none; }
+    .dark .ring-track { stroke: rgba(51, 65, 85, 0.4); }
+    .light .ring-track { stroke: rgba(226, 232, 240, 0.8); }
+    .ring-fill { fill: none; stroke-linecap: round; transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1); }
+
+    /* Animated Pulses & Waveforms */
+    @keyframes pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .pulse-soft { animation: pulse-soft 2s ease-in-out infinite; }
+
+    @keyframes soundwave {
+      0%, 100% { height: 4px; }
+      50% { height: 20px; }
+    }
+    .wave-bar { width: 3px; background: #06b6d4; border-radius: 2px; animation: soundwave 1s ease-in-out infinite; }
+    .wave-bar:nth-child(2) { animation-delay: 0.2s; }
+    .wave-bar:nth-child(3) { animation-delay: 0.4s; }
+    .wave-bar:nth-child(4) { animation-delay: 0.1s; }
+    .wave-bar:nth-child(5) { animation-delay: 0.3s; }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    .dark ::-webkit-scrollbar-thumb { background: rgba(71, 85, 105, 0.5); border-radius: 3px; }
+    .light ::-webkit-scrollbar-thumb { background: rgba(203, 213, 225, 0.8); border-radius: 3px; }
+
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white !important; color: black !important; }
+      .glass, .glass-card, .glass-inner { background: white !important; color: black !important; border: 1px solid #e2e8f0 !important; backdrop-filter: none !important; }
+    }
+  </style>
+</head>
+<body class="dark antialiased">
+  <div class="ambient-bg">
+    <div class="ambient-orb cyan"></div>
+    <div class="ambient-orb purple"></div>
+  </div>
+  <div id="root" class="relative z-10"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    /* ─── SVG ICONS ─── */
+    const Icon = ({ name, size = 16, className = "" }) => {
+      const icons = {
+        shield: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
+        globe: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>,
+        mic: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>,
+        volume: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>,
+        volumeX: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" x2="17" y1="9" y2="15"/><line x1="17" x2="23" y1="9" y2="15"/></svg>,
+        bug: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m8 2 1.88 1.88"/><path d="M14.12 3.88 16 2"/><path d="M9 7.13v-1a3.003 3.003 0 1 1 6 0v1"/><path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6"/><path d="M12 20v-9"/><path d="M6.53 9C4.6 8.8 3 7.1 3 5"/><path d="M6 13H2"/><path d="M3 21c0-2.1 1.7-3.9 3.8-4"/><path d="M20.97 5c0 2.1-1.6 3.8-3.5 4"/><path d="M22 13h-4"/><path d="M17.2 17c2.1.1 3.8 1.9 3.8 4"/></svg>,
+        checkCircle: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>,
+        alert: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>,
+        refresh: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>,
+        sun: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>,
+        moon: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>,
+        terminal: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>,
+        code: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>,
+        play: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="5 3 19 12 5 21 5 3"/></svg>,
+        branch: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="6" x2="6" y1="3" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>,
+        fileText: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>,
+        settings: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>,
+        sparkles: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>,
+        x: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      };
+      return icons[name] || null;
+    };
+
+    /* ─── RISK RING ─── */
+    function RiskRing({ score = 0, size = 100, strokeWidth = 7 }) {
+      const radius = (size - strokeWidth) / 2;
+      const circumference = 2 * Math.PI * radius;
+      const offset = circumference - (score / 100) * circumference;
+      const color = score === 0 ? '#94a3b8' : score > 70 ? '#f43f5e' : score > 40 ? '#f59e0b' : '#10b981';
+
+      return (
+        <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
+          <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
+            <circle className="ring-track" cx={size/2} cy={size/2} r={radius} strokeWidth={strokeWidth} />
+            <circle className="ring-fill" cx={size/2} cy={size/2} r={radius} strokeWidth={strokeWidth}
+              stroke={color} strokeDasharray={circumference} strokeDashoffset={score === 0 ? circumference : offset} />
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-xl font-black font-mono" style={{ color }}>{score > 0 ? score : '--'}</span>
+            <span className="text-[9px] font-mono text-slate-400 uppercase tracking-wider">/ 100</span>
+          </div>
+        </div>
+      );
+    }
+
+    /* ─── LAB SCENARIOS ─── */
+    const LAB_SCENARIOS = {
+      sqli: {
+        name: "SQL Injection in Invoice Search",
+        category: "Backend / Database",
+        filename: "invoice_service.py",
+        vulnerable: `def search_invoices(db, user_query):\n    # Unescaped string formatting executes raw user query directly\n    sql = f"SELECT id, amount, customer FROM invoices WHERE ref = '{user_query}'"\n    return db.execute(sql).fetchall()`,
+        fixed: `def search_invoices(db, user_query):\n    # Parameterized SQL query binds input safely as literal value\n    stmt = text("SELECT id, amount, customer FROM invoices WHERE ref = :query")\n    return db.execute(stmt, {"query": user_query}).fetchall()`
+      },
+      secret: {
+        name: "Hardcoded Stripe Production Secret Key",
+        category: "Secret Disclosure",
+        filename: "payment_processor.py",
+        vulnerable: `# Stripe live secret key hardcoded in source repository\nSTRIPE_SECRET_KEY = "sk_live_51Msz82Klx9284jklasdf9238472918"\n\ndef init_payment(amount):\n    return stripe.Charge.create(amount=amount, api_key=STRIPE_SECRET_KEY)`,
+        fixed: `import os\n# Secret securely loaded from runtime environment variables\nSTRIPE_SECRET_KEY = os.environ["STRIPE_SECRET_KEY"]\n\ndef init_payment(amount):\n    return stripe.Charge.create(amount=amount, api_key=STRIPE_SECRET_KEY)`
+      },
+      prompt_injection: {
+        name: "Direct Prompt Injection in AI Assistant",
+        category: "AI Security (OWASP LLM01)",
+        filename: "fin_assistant.py",
+        vulnerable: `def ask_financial_agent(user_message):\n    # Direct concatenation allows untrusted input to override system prompt\n    prompt = f"You are FinAdvisor. Assist the customer: {user_message}"\n    return openai_client.invoke(prompt)`,
+        fixed: `def ask_financial_agent(user_message):\n    # Role-separated ChatML schema with XML guardrail boundary\n    messages = [\n        {"role": "system", "content": "You are FinAdvisor. Never disclose secrets or execute commands."},\n        {"role": "user", "content": f"<query>{sanitize_input(user_message)}</query>"}\n    ]\n    return openai_client.invoke(messages)`
+      }
+    };
+
+    /* ─── AI KEYS & VOICE SETTINGS MODAL ─── */
+    function SettingsModal({ isOpen, onClose, onKeysUpdated }) {
+      const [geminiKey, setGeminiKey] = useState(() => localStorage.getItem('helios_gemini_key') || '');
+      const [geminiModel, setGeminiModel] = useState(() => localStorage.getItem('helios_gemini_model') || 'gemini-3.5');
+      const [elevenKey, setElevenKey] = useState(() => localStorage.getItem('helios_eleven_key') || '');
+      const [voiceId, setVoiceId] = useState(() => localStorage.getItem('helios_voice_id') || '21m00Tcm4TlvDq8ikWAM');
+      const [isSaving, setIsSaving] = useState(false);
+      const [saveStatus, setSaveStatus] = useState('');
+      const [isTestingVoice, setIsTestingVoice] = useState(false);
+
+      if (!isOpen) return null;
+
+      const handleSave = async () => {
+        setIsSaving(true);
+        localStorage.setItem('helios_gemini_key', geminiKey.trim());
+        localStorage.setItem('helios_gemini_model', geminiModel.trim());
+        localStorage.setItem('helios_eleven_key', elevenKey.trim());
+        localStorage.setItem('helios_voice_id', voiceId);
+
+        try {
+          await fetch('/api/v1/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              gemini_key: geminiKey.trim(),
+              gemini_model: geminiModel.trim(),
+              eleven_key: elevenKey.trim(),
+              voice_id: voiceId
+            })
+          });
+          setSaveStatus('Settings successfully saved to .env & local storage!');
+          if (onKeysUpdated) onKeysUpdated();
+        } catch (e) {
+          setSaveStatus('Saved locally (server sync failed)');
+        } finally {
+          setIsSaving(false);
+          setTimeout(() => setSaveStatus(''), 3000);
+        }
+      };
+
+      const handleTestVoice = () => {
+        setIsTestingVoice(true);
+        const testAudio = new Audio(`/api/v1/voice/tts?text=${encodeURIComponent("HELIOS Voice Security Copilot powered by Gemini 3.5 and ElevenLabs online. Ready to analyze your assets.")}&eleven_key=${encodeURIComponent(elevenKey)}&voice_id=${encodeURIComponent(voiceId)}`);
+        testAudio.onplay = () => setIsTestingVoice(false);
+        testAudio.onerror = () => {
+          setIsTestingVoice(false);
+          alert("Audio test failed. Check your ElevenLabs key or network connection.");
+        };
+        testAudio.play().catch(err => {
+          console.warn(err);
+          setIsTestingVoice(false);
+        });
+      };
+
+      return (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="glass-strong rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-cyan-500/30 text-xs">
+            <div className="flex items-center justify-between border-b pb-3">
+              <div className="flex items-center space-x-2">
+                <Icon name="sparkles" size={18} className="text-cyan-400" />
+                <span className="font-bold text-sm">AI Brain (Gemini 3.5) & Voice Settings</span>
+              </div>
+              <button onClick={onClose} className="text-slate-400 hover:text-white">
+                <Icon name="x" size={16} />
+              </button>
+            </div>
+
+            <p className="text-slate-400 leading-relaxed">
+              Configure free API keys to power the intelligent voice copilot. Even without keys, HELIOS includes a built-in heuristic security brain and free English voice response fallback.
+            </p>
+
+            {/* Gemini API Key */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="font-mono font-bold text-cyan-400">Google Gemini API Key (Brain)</label>
+                <a href="https://aistudio.google.com/app/apikey" target="_blank" className="text-[10px] text-slate-400 hover:text-cyan-400 underline">
+                  Get Free Key ↗
+                </a>
+              </div>
+              <input
+                type="password"
+                value={geminiKey}
+                onChange={e => setGeminiKey(e.target.value)}
+                placeholder="AIzaSy..."
+                className="w-full glass-input px-3 py-2 rounded-xl font-mono text-xs focus:outline-none focus:ring-1 focus:ring-cyan-500"
+              />
+              <span className="text-[10px] text-slate-500">Powers natural intent understanding and conversational security analysis.</span>
+            </div>
+
+            {/* Gemini Brain Model Selection */}
+            <div className="space-y-1.5 pt-1">
+              <label className="font-mono font-bold text-cyan-400">Gemini Brain Model</label>
+              <select
+                value={geminiModel}
+                onChange={e => setGeminiModel(e.target.value)}
+                className="w-full glass-input px-3 py-2 rounded-xl font-mono text-xs focus:outline-none"
+              >
+                <option value="gemini-3.5">Gemini 3.5 (Next-Gen AI Security Engine)</option>
+                <option value="gemini-2.0-flash">Gemini 2.0 Flash (Latest Google SOTA)</option>
+                <option value="gemini-1.5-flash">Gemini 1.5 Flash (Fast & Resilient)</option>
+                <option value="gemini-1.5-pro">Gemini 1.5 Pro (Deep Cybersecurity Reasoning)</option>
+              </select>
+              <span className="text-[10px] text-slate-500">Autonomous resilient fallback to Gemini 2.0 / 1.5 active.</span>
+            </div>
+
+            {/* ElevenLabs API Key */}
+            <div className="space-y-1.5 pt-1">
+              <div className="flex items-center justify-between">
+                <label className="font-mono font-bold text-cyan-400">ElevenLabs API Key (English Voice)</label>
+                <a href="https://elevenlabs.io" target="_blank" className="text-[10px] text-slate-400 hover:text-cyan-400 underline">
+                  Get Free Key ↗
+                </a>
+              </div>
+              <input
+                type="password"
+                value={elevenKey}
+                onChange={e => setElevenKey(e.target.value)}
+                placeholder="sk_..."
+                className="w-full glass-input px-3 py-2 rounded-xl font-mono text-xs focus:outline-none focus:ring-1 focus:ring-cyan-500"
+              />
+            </div>
+
+            {/* ElevenLabs Voice Selection */}
+            <div className="space-y-1.5">
+              <label className="font-mono text-slate-400">Preferred English Voice</label>
+              <select
+                value={voiceId}
+                onChange={e => setVoiceId(e.target.value)}
+                className="w-full glass-input px-3 py-2 rounded-xl font-mono text-xs focus:outline-none"
+              >
+                <option value="21m00Tcm4TlvDq8ikWAM">Rachel (Calm, Professional SOC Tone)</option>
+                <option value="pNInz6obpgDQGcFmaJgB">Adam (Deep, Authoritative)</option>
+                <option value="ErXwobaYiN019PkySvjV">Antoni (Crisp, Executive)</option>
+                <option value="EXAVITQu4vr4xnSDxMaL">Bella (Engaging, Clear)</option>
+              </select>
+            </div>
+
+            {saveStatus && (
+              <div className="p-2 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-mono text-[11px] text-center">
+                {saveStatus}
+              </div>
+            )}
+
+            <div className="flex items-center space-x-2 pt-3 border-t">
+              <button
+                onClick={handleTestVoice}
+                disabled={isTestingVoice}
+                className="px-4 py-2 glass hover:border-cyan-500/50 rounded-xl font-mono text-xs font-semibold flex items-center space-x-1.5 text-cyan-400"
+              >
+                <Icon name="volume" size={14} />
+                <span>{isTestingVoice ? 'Playing...' : 'Test Voice Output'}</span>
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={isSaving}
+                className="flex-1 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white rounded-xl font-mono text-xs font-bold shadow transition"
+              >
+                {isSaving ? 'Saving...' : 'Save Configuration'}
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    /* ─── REAL-TIME TWO-WAY VOICE COPILOT COMPONENT ─── */
+    function VoiceCopilot({ activeTab, setActiveTab, currentUrl, onTriggerScan, onTriggerRetest, theme, toggleTheme }) {
+      const [orbState, setOrbState] = useState('IDLE'); // IDLE, LISTENING, THINKING, SPEAKING, CONFIRMING
+      const [transcript, setTranscript] = useState('');
+      const [lastSpeech, setLastSpeech] = useState('');
+      const [isOpen, setIsOpen] = useState(false);
+      const [pendingChallenge, setPendingChallenge] = useState(null);
+      const [voiceMuted, setVoiceMuted] = useState(false);
+      const [handsFree, setHandsFree] = useState(true); // Continuous two-way dialogue mode
+      const [manualText, setManualText] = useState('');
+      const recognitionRef = useRef(null);
+      const audioRef = useRef(null);
+      const transcriptRef = useRef('');
+      const silenceTimerRef = useRef(null);
+      const hasGreetedOnLoadRef = useRef(false);
+
+      // Synthesize pure Web Audio cues (no network/file dependencies)
+      const playChime = (type = 'listen') => {
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          if (type === 'listen') {
+            osc.frequency.setValueAtTime(480, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(720, ctx.currentTime + 0.12);
+            gain.gain.setValueAtTime(0.04, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.2);
+          } else if (type === 'ack') {
+            osc.frequency.setValueAtTime(800, ctx.currentTime);
+            gain.gain.setValueAtTime(0.04, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.15);
+          }
+        } catch (e) {}
+      };
+
+      // Play synthesized audio reliably via HTML5 Audio element with fallback to SpeechSynthesis
+      const playSpokenAudio = (audioUrl, fallbackText, onComplete) => {
+        if (voiceMuted) {
+          if (onComplete) onComplete();
+          return;
+        }
+
+        // Stop any currently playing audio
+        if (audioRef.current) {
+          audioRef.current.pause();
+          audioRef.current = null;
+        }
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+        }
+
+        const elevenKey = localStorage.getItem('helios_eleven_key') || '';
+        const voiceId = localStorage.getItem('helios_voice_id') || '21m00Tcm4TlvDq8ikWAM';
+        const url = audioUrl 
+          ? `${audioUrl}&eleven_key=${encodeURIComponent(elevenKey)}&voice_id=${encodeURIComponent(voiceId)}` 
+          : `/api/v1/voice/tts?text=${encodeURIComponent(fallbackText)}&eleven_key=${encodeURIComponent(elevenKey)}&voice_id=${encodeURIComponent(voiceId)}`;
+
+        const audio = new Audio(url);
+        audioRef.current = audio;
+
+        audio.onplay = () => {
+          setOrbState('SPEAKING');
+        };
+
+        const handleFinish = () => {
+          setOrbState('IDLE');
+          if (onComplete) onComplete();
+        };
+
+        audio.onended = handleFinish;
+
+        audio.onerror = () => {
+          console.warn("Audio element stream error, using speech synthesis fallback");
+          if ('speechSynthesis' in window) {
+            const u = new SpeechSynthesisUtterance(fallbackText);
+            u.rate = 1.0;
+            u.pitch = 0.95;
+            u.volume = 1.0;
+            setOrbState('SPEAKING');
+            u.onend = handleFinish;
+            u.onerror = handleFinish;
+            window.speechSynthesis.speak(u);
+          } else {
+            handleFinish();
+          }
+        };
+
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(err => {
+            console.warn("Autoplay policy blocked audio stream:", err);
+            if ('speechSynthesis' in window) {
+              const u = new SpeechSynthesisUtterance(fallbackText);
+              setOrbState('SPEAKING');
+              u.onend = handleFinish;
+              u.onerror = handleFinish;
+              try {
+                window.speechSynthesis.speak(u);
+              } catch (e) {
+                handleFinish();
+              }
+            } else {
+              handleFinish();
+            }
+          });
+        }
+      };
+
+      // Voice greeting helper
+      const speakGreeting = (onFinish) => {
+        const greetingText = "Welcome sir, how may I help you?";
+        setLastSpeech(greetingText);
+        setTranscript("HELIOS: " + greetingText);
+        playSpokenAudio(
+          `/api/v1/voice/tts?text=${encodeURIComponent(greetingText)}`,
+          greetingText,
+          onFinish
+        );
+      };
+
+      // Start listening helper with gentle chime
+      const startListening = () => {
+        if (audioRef.current) audioRef.current.pause();
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+
+        transcriptRef.current = '';
+        setTranscript('Listening... Speak your command naturally');
+        setOrbState('LISTENING');
+        playChime('listen');
+
+        try {
+          if (recognitionRef.current) {
+            recognitionRef.current.start();
+          } else {
+            const manual = prompt("HELIOS Voice Command (Speech API not available):", "Scan this website");
+            if (manual) executeVoicePipeline(manual, false);
+          }
+        } catch (e) {
+          // If already active, abort and restart fresh
+          try {
+            recognitionRef.current?.abort();
+            setTimeout(() => {
+              try { recognitionRef.current?.start(); } catch (err) {}
+            }, 120);
+          } catch (err) {}
+        }
+      };
+
+      // Initialize SpeechRecognition ONCE with silence detection
+      useEffect(() => {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+          const rec = new SpeechRecognition();
+          rec.continuous = true;
+          rec.interimResults = true;
+          rec.lang = 'en-US';
+
+          rec.onstart = () => {
+            setOrbState('LISTENING');
+            transcriptRef.current = '';
+          };
+
+          rec.onresult = (event) => {
+            let interim = '';
+            let final = '';
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+              if (event.results[i].isFinal) {
+                final += event.results[i][0].transcript + ' ';
+              } else {
+                interim += event.results[i][0].transcript;
+              }
+            }
+            const recognized = (final + interim).trim();
+            if (recognized) {
+              setTranscript(recognized);
+              transcriptRef.current = recognized;
+
+              // Smart silence timer: if user stops speaking for 1.5s, execute command!
+              if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+              silenceTimerRef.current = setTimeout(() => {
+                try {
+                  recognitionRef.current?.stop();
+                } catch (e) {}
+              }, 1500);
+            }
+          };
+
+          rec.onerror = (event) => {
+            console.warn('Speech recognition error:', event.error);
+            if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+            if (event.error === 'not-allowed') {
+              setTranscript('Microphone access blocked. Click mic to grant permission or type below.');
+            }
+            setOrbState('IDLE');
+          };
+
+          rec.onend = () => {
+            if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+            const command = transcriptRef.current.trim();
+            if (command && !command.startsWith('HELIOS:') && !command.startsWith('Listening')) {
+              playChime('ack');
+              executeVoicePipeline(command, false);
+            } else {
+              setOrbState('IDLE');
+            }
+          };
+
+          recognitionRef.current = rec;
+        }
+
+        // GREETING ON SITE OPEN
+        const triggerGreetingOnOpen = () => {
+          if (hasGreetedOnLoadRef.current) return;
+          hasGreetedOnLoadRef.current = true;
+          speakGreeting();
+        };
+
+        // Try direct audio play on mount
+        triggerGreetingOnOpen();
+
+        // Also bind to first document interaction to bypass strict browser autoplay policies
+        const onFirstInteraction = () => {
+          if (!hasGreetedOnLoadRef.current) {
+            triggerGreetingOnOpen();
+          }
+          window.removeEventListener('click', onFirstInteraction);
+          window.removeEventListener('pointerdown', onFirstInteraction);
+          window.removeEventListener('keydown', onFirstInteraction);
+        };
+
+        window.addEventListener('click', onFirstInteraction);
+        window.addEventListener('pointerdown', onFirstInteraction);
+        window.addEventListener('keydown', onFirstInteraction);
+
+        return () => {
+          window.removeEventListener('click', onFirstInteraction);
+          window.removeEventListener('pointerdown', onFirstInteraction);
+          window.removeEventListener('keydown', onFirstInteraction);
+        };
+      }, []);
+
+      // Execute command to real backend endpoint
+      const executeVoicePipeline = async (commandText, isConfirmed) => {
+        if (!commandText || !commandText.trim()) return;
+        setOrbState('THINKING');
+        try {
+          const geminiKey = localStorage.getItem('helios_gemini_key') || '';
+          const geminiModel = localStorage.getItem('helios_gemini_model') || 'gemini-3.5';
+          const res = await fetch('/api/v1/voice/command', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              transcript: commandText,
+              confirmed: isConfirmed,
+              gemini_key: geminiKey,
+              gemini_model: geminiModel,
+              context: {
+                active_tab: activeTab,
+                target_url: currentUrl,
+                theme: theme
+              }
+            })
+          });
+
+          const data = await res.json();
+
+          if (data.status === 'CONFIRMATION_REQUIRED') {
+            setOrbState('CONFIRMING');
+            setPendingChallenge(data);
+            playSpokenAudio(data.audio_url, data.speech);
+            return;
+          }
+
+          if (data.status === 'SUCCESS' || data.status === 'SECURITY_BLOCK') {
+            setLastSpeech(data.speech);
+
+            // Execute UI Actions dynamically
+            if (data.ui_action?.tab) {
+              setActiveTab(data.ui_action.tab);
+            }
+            if (data.ui_action?.theme) {
+              if (data.ui_action.theme !== theme) {
+                toggleTheme();
+              }
+            }
+            if (data.ui_action?.scan_result && onTriggerScan) {
+              onTriggerScan(data.ui_action.scan_result);
+            }
+            if (data.ui_action?.retest_id && onTriggerRetest) {
+              onTriggerRetest(data.ui_action.retest_id, data.ui_action.retest_status);
+            }
+
+            // Continuous hands-free dialogue: re-listen after replying unless user asked to stop
+            playSpokenAudio(data.audio_url, data.speech, () => {
+              if (handsFree && data.ui_action?.listening !== false) {
+                setTimeout(() => {
+                  startListening();
+                }, 300);
+              }
+            });
+          }
+        } catch (err) {
+          console.error(err);
+          setOrbState('IDLE');
+          playSpokenAudio(null, "Failed to connect to the HELIOS voice controller.");
+        }
+      };
+
+      // Handle Mic / Orb Click
+      const handleOrbClick = () => {
+        setIsOpen(true);
+
+        // Resume AudioContext on user gesture
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          ctx.resume();
+        } catch (e) {}
+
+        // If currently speaking, stop speech
+        if (orbState === 'SPEAKING') {
+          if (audioRef.current) audioRef.current.pause();
+          if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+          setOrbState('IDLE');
+          return;
+        }
+
+        // If currently listening, stop listening
+        if (orbState === 'LISTENING') {
+          try {
+            recognitionRef.current?.stop();
+          } catch (e) {}
+          setOrbState('IDLE');
+          return;
+        }
+
+        // GREET IN VOICE: "Welcome sir, how may I help you?"
+        // Then automatically start listening for the user's command!
+        speakGreeting(() => {
+          startListening();
+        });
+      };
+
+      useEffect(() => {
+        const handleCustomMic = () => {
+          handleOrbClick();
+        };
+        window.addEventListener('helios-mic-click', handleCustomMic);
+        return () => window.removeEventListener('helios-mic-click', handleCustomMic);
+      }, [handleOrbClick]);
+
+      const handleManualSubmit = (e) => {
+        e.preventDefault();
+        if (!manualText.trim()) return;
+        const text = manualText.trim();
+        setManualText('');
+        setTranscript(text);
+        executeVoicePipeline(text, false);
+      };
+
+      return (
+        <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end space-y-3 no-print">
+          {/* Transcript & Command Status Popover */}
+          {isOpen && (
+            <div className="glass-strong rounded-2xl p-4 w-96 shadow-2xl border border-cyan-500/30 text-xs space-y-3">
+              <div className="flex items-center justify-between border-b pb-2">
+                <div className="flex items-center space-x-2">
+                  <span className={`h-2.5 w-2.5 rounded-full ${
+                    orbState === 'LISTENING' ? 'bg-emerald-500 animate-ping' :
+                    orbState === 'THINKING' ? 'bg-amber-400 animate-spin' :
+                    orbState === 'SPEAKING' ? 'bg-cyan-400 animate-pulse' :
+                    orbState === 'CONFIRMING' ? 'bg-rose-500 animate-bounce' : 'bg-slate-400'
+                  }`} />
+                  <span className="font-mono font-bold uppercase tracking-wider text-[11px]">
+                    Copilot: {orbState}
+                  </span>
+                  <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-bold">
+                    Gemini 3.5
+                  </span>
+                  <button
+                    onClick={() => setHandsFree(!handsFree)}
+                    className={`text-[9px] font-mono px-1.5 py-0.5 rounded border font-bold transition ${
+                      handsFree 
+                        ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' 
+                        : 'bg-slate-800 text-slate-400 border-slate-700'
+                    }`}
+                    title="Hands-free dialogue mode (Automatically listens after replying)"
+                  >
+                    Hands-Free: {handsFree ? 'ON' : 'OFF'}
+                  </button>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => {
+                      setVoiceMuted(!voiceMuted);
+                      if (!voiceMuted && audioRef.current) audioRef.current.pause();
+                    }}
+                    className="text-slate-400 hover:text-white"
+                    title={voiceMuted ? "Unmute Voice" : "Mute Voice"}
+                  >
+                    <Icon name={voiceMuted ? "volumeX" : "volume"} size={14} />
+                  </button>
+                  <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-white">
+                    <Icon name="x" size={14} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Dynamic Sound Wave Indicator */}
+              {orbState === 'LISTENING' && (
+                <div className="flex items-center justify-center space-x-1.5 py-1.5 bg-emerald-500/10 rounded-xl border border-emerald-500/30">
+                  <div className="wave-bar"></div>
+                  <div className="wave-bar"></div>
+                  <div className="wave-bar"></div>
+                  <div className="wave-bar"></div>
+                  <div className="wave-bar"></div>
+                  <span className="text-[10px] font-mono text-emerald-400 ml-2 font-bold animate-pulse">
+                    Listening to you...
+                  </span>
+                </div>
+              )}
+
+              {/* Spoken User Transcript */}
+              <div className="font-mono text-[11px] glass-inner p-2.5 rounded-xl min-h-[42px] flex items-center border border-white/5">
+                {transcript || "Tap the mic orb and speak your security instruction..."}
+              </div>
+
+              {/* Spoken Response Preview */}
+              {lastSpeech && (
+                <div className="text-[11px] text-cyan-400 glass-inner p-2.5 rounded-xl border border-cyan-500/30 leading-relaxed flex items-start space-x-2">
+                  <button
+                    onClick={() => playSpokenAudio(null, lastSpeech)}
+                    title="Replay Voice"
+                    className="mt-0.5 text-cyan-400 hover:text-cyan-200 transition"
+                  >
+                    <Icon name="volume" size={13} />
+                  </button>
+                  <div>
+                    <strong className="text-slate-300 font-bold">HELIOS: </strong>
+                    <span>{lastSpeech}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Quick Input Box / Voice Push-to-Talk */}
+              <form onSubmit={handleManualSubmit} className="flex items-center space-x-1.5 pt-1">
+                <input
+                  type="text"
+                  value={manualText}
+                  onChange={(e) => setManualText(e.target.value)}
+                  placeholder="Or type command here..."
+                  className="flex-1 bg-slate-900/60 border border-slate-700/60 rounded-xl px-2.5 py-1.5 text-[11px] font-mono text-slate-200 focus:outline-none focus:border-cyan-500"
+                />
+                <button
+                  type="submit"
+                  className="px-2.5 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-[10px] font-mono font-bold transition"
+                >
+                  Send
+                </button>
+                <button
+                  type="button"
+                  onClick={startListening}
+                  className={`p-1.5 rounded-xl border transition ${
+                    orbState === 'LISTENING' 
+                      ? 'bg-emerald-500 text-white border-emerald-400 animate-pulse' 
+                      : 'glass text-slate-300 hover:text-white border-cyan-500/30'
+                  }`}
+                  title="Speak Now"
+                >
+                  <Icon name="mic" size={13} />
+                </button>
+              </form>
+
+              {/* Confirmation Challenge Gate */}
+              {pendingChallenge && (
+                <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/40 space-y-2">
+                  <div className="font-bold text-rose-400 text-[10px] uppercase font-mono flex items-center space-x-1">
+                    <Icon name="alert" size={12} />
+                    <span>Permission Challenge Required</span>
+                  </div>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">{pendingChallenge.challenge_prompt}</p>
+                  <div className="flex space-x-2 pt-1">
+                    <button
+                      onClick={() => {
+                        const original = transcript;
+                        setPendingChallenge(null);
+                        executeVoicePipeline(original, true);
+                      }}
+                      className="flex-1 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-lg font-mono font-bold text-[10px] transition"
+                    >
+                      Authorize Execution
+                    </button>
+                    <button
+                      onClick={() => {
+                        setPendingChallenge(null);
+                        setOrbState('IDLE');
+                      }}
+                      className="px-3 py-1.5 glass text-slate-300 rounded-lg text-[10px] font-mono"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Quick Command Chips */}
+              <div className="pt-2 border-t border-white/5 space-y-1.5">
+                <div className="text-[10px] font-mono text-slate-400 font-bold flex items-center justify-between">
+                  <span>Quick Voice Prompts</span>
+                  <span className="text-[9px] text-cyan-400">Click to run</span>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    { label: "⚡ Scan this website", cmd: "Kindly run security scan on this website" },
+                    { label: "🛡️ Show critical findings", cmd: "Show critical findings" },
+                    { label: "🔄 Retest finding", cmd: "Retest finding HLS-WEB-001" },
+                    { label: "🌓 Toggle theme", cmd: "Toggle theme" },
+                    { label: "📑 CISO report", cmd: "Open CISO report" }
+                  ].map((chip, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => {
+                        setTranscript(chip.cmd);
+                        executeVoicePipeline(chip.cmd, false);
+                      }}
+                      className="text-[10px] font-mono px-2 py-1 rounded-lg glass hover:border-cyan-500/50 hover:text-cyan-400 text-slate-300 transition"
+                    >
+                      {chip.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Floating Reactive Voice Orb Button */}
+          <button
+            onClick={handleOrbClick}
+            className={`h-14 w-14 rounded-full glass-strong flex items-center justify-center shadow-2xl transition-all transform hover:scale-105 ${
+              orbState === 'LISTENING' ? 'border-emerald-500 shadow-emerald-500/50 glow-cyan scale-110' :
+              orbState === 'THINKING' ? 'border-amber-400 shadow-amber-400/40' :
+              orbState === 'SPEAKING' ? 'border-cyan-400 shadow-cyan-400/50 animate-pulse' :
+              orbState === 'CONFIRMING' ? 'border-rose-500 shadow-rose-500/50 animate-bounce' :
+              'border-cyan-500/40 hover:border-cyan-400'
+            }`}
+            title="Click to talk with HELIOS (Speaks greeting and listens)"
+          >
+            <div className="relative flex items-center justify-center">
+              <Icon
+                name={orbState === 'SPEAKING' ? "volume" : "mic"}
+                size={22}
+                className={
+                  orbState === 'LISTENING' ? 'text-emerald-400' :
+                  orbState === 'SPEAKING' ? 'text-cyan-400' :
+                  orbState === 'CONFIRMING' ? 'text-rose-400' : 'text-slate-200'
+                }
+              />
+              {orbState === 'LISTENING' && (
+                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                </span>
+              )}
+            </div>
+          </button>
+        </div>
+      );
+    }
+
+    /* ─── MAIN APP COMPONENT ─── */
+    function App() {
+      const [theme, setTheme] = useState(() => localStorage.getItem('helios_theme') || 'dark');
+      const [activeTab, setActiveTab] = useState('tracker');
+      const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+      // Live Website Scanner State
+      const [targetUrl, setTargetUrl] = useState('https://see-it-report-it.lovable.app');
+      const [isScanningUrl, setIsScanningUrl] = useState(false);
+      const [urlScanResult, setUrlScanResult] = useState(null);
+      const [retestingId, setRetestingId] = useState(null);
+      const [retestOutcome, setRetestOutcome] = useState({});
+
+      // Interactive Security Lab State
+      const [labScenario, setLabScenario] = useState('sqli');
+      const [labCode, setLabCode] = useState(LAB_SCENARIOS.sqli.vulnerable);
+      const [isScanningCode, setIsScanningCode] = useState(false);
+      const [codeScanResult, setCodeScanResult] = useState(null);
+
+      // Handle Theme Toggle
+      useEffect(() => {
+        const root = document.documentElement;
+        if (theme === 'dark') {
+          root.classList.add('dark');
+          root.classList.remove('light');
+          document.body.className = 'dark';
+        } else {
+          root.classList.add('light');
+          root.classList.remove('dark');
+          document.body.className = 'light';
+        }
+        localStorage.setItem('helios_theme', theme);
+      }, [theme]);
+
+      const toggleTheme = () => {
+        setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+      };
+
+      // Trigger Live URL Probe
+      const handleScanUrl = async (e) => {
+        if (e) e.preventDefault();
+        if (!targetUrl.trim()) return;
+
+        setIsScanningUrl(true);
+        setUrlScanResult(null);
+
+        try {
+          const res = await fetch('/api/scan-url', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: targetUrl.trim() })
+          });
+          const data = await res.json();
+          setUrlScanResult(data);
+        } catch (err) {
+          setUrlScanResult({
+            error: `Failed to probe live target: ${err.message}`,
+            findings: [],
+            scan_logs: [`Error: ${err.message}`]
+          });
+        } finally {
+          setIsScanningUrl(false);
+        }
+      };
+
+      // Trigger Live Re-Test
+      const handleRetestUrl = async (checkId) => {
+        if (!urlScanResult?.target_url) return;
+        setRetestingId(checkId);
+
+        try {
+          const res = await fetch('/api/retest-url', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              url: urlScanResult.target_url,
+              check_id: checkId
+            })
+          });
+          const data = await res.json();
+
+          setRetestOutcome(prev => ({
+            ...prev,
+            [checkId]: {
+              status: data.retest_status,
+              note: data.verification_note,
+              time: data.timestamp
+            }
+          }));
+
+          if (data.retest_status === 'RESOLVED') {
+            setUrlScanResult(prev => {
+              if (!prev) return prev;
+              const updated = prev.findings.map(f => f.id === checkId ? { ...f, status: 'RESOLVED' } : f);
+              return { ...prev, findings: updated };
+            });
+          }
+        } catch (err) {
+          setRetestOutcome(prev => ({
+            ...prev,
+            [checkId]: {
+              status: 'RE-TEST ERROR',
+              note: err.message
+            }
+          }));
+        } finally {
+          setRetestingId(null);
+        }
+      };
+
+      // Trigger Code Scan in Lab
+      const handleScanLabCode = async () => {
+        setIsScanningCode(true);
+        setCodeScanResult(null);
+
+        try {
+          const res = await fetch('/api/scan-code', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              code: labCode,
+              filename: LAB_SCENARIOS[labScenario].filename
+            })
+          });
+          const data = await res.json();
+          setCodeScanResult(data);
+        } catch (err) {
+          setCodeScanResult({ error: err.message, findings: [] });
+        } finally {
+          setIsScanningCode(false);
+        }
+      };
+
+      // Voice trigger handlers
+      const handleVoiceScanTrigger = (newScanResult) => {
+        setUrlScanResult(newScanResult);
+        if (newScanResult?.target_url) {
+          setTargetUrl(newScanResult.target_url);
+        }
+        setActiveTab('tracker');
+      };
+
+      const handleVoiceRetestTrigger = (findingId, status) => {
+        setRetestOutcome(prev => ({
+          ...prev,
+          [findingId]: {
+            status: status,
+            note: `Voice command re-test executed: ${status}`,
+            time: new Date().toLocaleTimeString()
+          }
+        }));
+        if (status === 'RESOLVED') {
+          setUrlScanResult(prev => {
+            if (!prev) return prev;
+            return {
+              ...prev,
+              findings: prev.findings.map(f => f.id === findingId ? { ...f, status: 'RESOLVED' } : f)
+            };
+          });
+        }
+      };
+
+      const activeFindingsCount = urlScanResult?.findings?.filter(f => f.status !== 'RESOLVED')?.length || 0;
+      const resolvedFindingsCount = urlScanResult?.findings?.filter(f => f.status === 'RESOLVED')?.length || 0;
+      const currentRiskScore = urlScanResult?.metrics?.risk_score || 0;
+      const currentRiskLevel = urlScanResult?.metrics?.risk_level || 'CLEAN';
+
+      return (
+        <div className="min-h-screen flex flex-col">
+
+          {/* ─── TOP NAVIGATION & CONTROLS ─── */}
+          <header className="glass sticky top-0 z-40 px-6 py-3 border-b flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/20">
+                <Icon name="shield" size={20} />
+              </div>
+              <div>
+                <div className="flex items-center space-x-2">
+                  <span className="font-extrabold tracking-wider text-base">HELIOS</span>
+                  <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-500 border border-cyan-500/20 font-semibold">
+                    Voice Copilot Active
+                  </span>
+                </div>
+                <p className="text-xs text-slate-400 -mt-0.5">Build with AI. Secure with HELIOS.</p>
+              </div>
+            </div>
+
+            {/* Tab Navigation */}
+            <div className="hidden md:flex items-center space-x-1 glass p-1 rounded-xl text-xs font-mono">
+              <button
+                onClick={() => setActiveTab('tracker')}
+                className={`px-3 py-1.5 rounded-lg transition font-semibold flex items-center space-x-1.5 ${
+                  activeTab === 'tracker' ? 'bg-cyan-500 text-white shadow' : 'text-slate-400 hover:text-slate-100'
+                }`}
+              >
+                <Icon name="globe" size={13} />
+                <span>Real-World Security Tracker</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('lab')}
+                className={`px-3 py-1.5 rounded-lg transition font-semibold flex items-center space-x-1.5 ${
+                  activeTab === 'lab' ? 'bg-cyan-500 text-white shadow' : 'text-slate-400 hover:text-slate-100'
+                }`}
+              >
+                <Icon name="code" size={13} />
+                <span>Interactive Security Lab</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('architecture')}
+                className={`px-3 py-1.5 rounded-lg transition font-semibold flex items-center space-x-1.5 ${
+                  activeTab === 'architecture' ? 'bg-cyan-500 text-white shadow' : 'text-slate-400 hover:text-slate-100'
+                }`}
+              >
+                <Icon name="branch" size={13} />
+                <span>Attack Paths & Architecture</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('report')}
+                className={`px-3 py-1.5 rounded-lg transition font-semibold flex items-center space-x-1.5 ${
+                  activeTab === 'report' ? 'bg-cyan-500 text-white shadow' : 'text-slate-400 hover:text-slate-100'
+                }`}
+              >
+                <Icon name="fileText" size={13} />
+                <span>CISO Report</span>
+              </button>
+            </div>
+
+            {/* Controls: AI Settings & Theme */}
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setIsSettingsOpen(true)}
+                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border glass hover:border-cyan-500/50 text-xs font-mono transition text-cyan-400"
+                title="Configure Gemini & ElevenLabs Keys"
+              >
+                <Icon name="sparkles" size={14} />
+                <span className="hidden sm:inline">AI Keys & Voice</span>
+              </button>
+
+              <button
+                onClick={toggleTheme}
+                className="flex items-center space-x-2 px-3 py-1.5 rounded-xl border glass hover:border-cyan-500/50 text-xs font-mono transition"
+                title="Toggle Dark and Light Mode"
+              >
+                {theme === 'dark' ? (
+                  <>
+                    <Icon name="sun" size={14} className="text-amber-400" />
+                    <span className="hidden sm:inline">Light Mode</span>
+                  </>
+                ) : (
+                  <>
+                    <Icon name="moon" size={14} className="text-indigo-600" />
+                    <span className="hidden sm:inline">Dark Mode</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </header>
+
+          {/* ─── STATUS BAR ─── */}
+          <div className="glass px-6 py-2 border-b text-xs flex items-center justify-between font-mono">
+            <div className="flex items-center space-x-2">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 pulse-soft"></span>
+              <span className="text-slate-400">Autonomous Security Engine & Voice Copilot: <strong className={theme === 'dark' ? 'text-white' : 'text-slate-800'}>Online</strong></span>
+            </div>
+            <div className="text-cyan-500 text-[11px] hidden sm:block">
+              Say: "Kindly run it for me" • "Show critical findings" • "Switch to light mode"
+            </div>
+          </div>
+
+          {/* ─── MAIN CONTENT ─── */}
+          <main className="flex-1 p-6 max-w-7xl mx-auto w-full space-y-6">
+
+            {/* Real Metric HUD */}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <div className="col-span-2 glass-card rounded-2xl p-4 flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-mono tracking-wider text-slate-400">HELIOS Live Risk Score</div>
+                  <div className="text-3xl font-black mt-1 flex items-baseline space-x-2">
+                    <span className={currentRiskScore > 70 ? 'text-rose-500' : currentRiskScore > 40 ? 'text-amber-500' : 'text-emerald-500'}>
+                      {currentRiskScore > 0 ? currentRiskScore : '0'}
+                    </span>
+                    <span className="text-xs font-mono text-slate-400">/ 100</span>
+                    <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold ${
+                      currentRiskLevel === 'CRITICAL' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' :
+                      currentRiskLevel === 'HIGH' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
+                      'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                    }`}>
+                      {currentRiskLevel}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-slate-400 mt-1">
+                    {urlScanResult ? `Calculated from ${urlScanResult.findings.length} real live signals` : 'Zero fake data — awaiting target scan or lab run'}
+                  </div>
+                </div>
+                <RiskRing score={currentRiskScore} />
+              </div>
+
+              <div className="glass-card rounded-2xl p-4">
+                <div className="text-[10px] uppercase font-mono tracking-wider text-slate-400">Active Vulnerabilities</div>
+                <div className="text-2xl font-black text-rose-500 mt-1">{activeFindingsCount}</div>
+                <div className="text-[10px] font-mono text-slate-400 mt-1">Unresolved issues</div>
+              </div>
+
+              <div className="glass-card rounded-2xl p-4">
+                <div className="text-[10px] uppercase font-mono tracking-wider text-slate-400">Headers Audited</div>
+                <div className="text-2xl font-black text-cyan-500 mt-1">
+                  {urlScanResult?.headers_inspected ? Object.keys(urlScanResult.headers_inspected).length : 0}
+                </div>
+                <div className="text-[10px] font-mono text-slate-400 mt-1">Live response headers</div>
+              </div>
+
+              <div className="glass-card rounded-2xl p-4 border-l-2 border-l-emerald-500">
+                <div className="text-[10px] uppercase font-mono tracking-wider text-slate-400">Re-Tested & Resolved</div>
+                <div className="text-2xl font-black text-emerald-500 mt-1">{resolvedFindingsCount}</div>
+                <div className="text-[10px] font-mono text-slate-400 mt-1">Verified fixes</div>
+              </div>
+            </div>
+
+            {/* TAB 1: REAL-WORLD TARGET TRACKER & FINDINGS */}
+            {activeTab === 'tracker' && (
+              <div className="space-y-6">
+                <div className="glass-card rounded-2xl p-6 glow-cyan">
+                  <div className="flex items-center space-x-2 text-sm font-bold mb-2">
+                    <Icon name="globe" size={18} className="text-cyan-500" />
+                    <span>Real-World Target Security Scanner</span>
+                  </div>
+                  <p className="text-xs text-slate-400 mb-4">
+                    Enter any live website URL. HELIOS will transmit real HTTP probes, inspect actual response headers, detect CORS misconfigurations, and audit clickjacking defenses. You can also command HELIOS by voice: <em>"Helios, kindly run it for me"</em>.
+                  </p>
+
+                  <form onSubmit={handleScanUrl} className="flex flex-col sm:flex-row gap-3">
+                    <input
+                      type="text"
+                      value={targetUrl}
+                      onChange={(e) => setTargetUrl(e.target.value)}
+                      placeholder="e.g. https://see-it-report-it.lovable.app"
+                      className="flex-1 glass-input px-4 py-2.5 rounded-xl font-mono text-xs focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    />
+                    <button
+                      type="submit"
+                      disabled={isScanningUrl}
+                      className="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white rounded-xl text-xs font-bold font-mono flex items-center justify-center space-x-2 shadow-lg shadow-cyan-500/20 disabled:opacity-50 transition"
+                    >
+                      <Icon name="play" size={14} className={isScanningUrl ? 'animate-spin' : ''} />
+                      <span>{isScanningUrl ? 'Probing Target...' : 'Run Live Security Audit'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => window.dispatchEvent(new CustomEvent('helios-mic-click'))}
+                      className="px-4 py-2.5 glass hover:border-cyan-500/50 text-cyan-400 rounded-xl text-xs font-bold font-mono flex items-center justify-center space-x-2 transition"
+                      title="Speak command to HELIOS"
+                    >
+                      <Icon name="mic" size={14} />
+                      <span>Voice Command</span>
+                    </button>
+                  </form>
+
+                  <div className="flex flex-wrap gap-2 mt-3 text-[11px] font-mono text-slate-400">
+                    <span>Quick live targets:</span>
+                    <button type="button" onClick={() => setTargetUrl('https://see-it-report-it.lovable.app')} className="hover:text-cyan-500 underline">https://see-it-report-it.lovable.app</button>
+                    <span>•</span>
+                    <button type="button" onClick={() => setTargetUrl('https://httpbin.org')} className="hover:text-cyan-500 underline">https://httpbin.org</button>
+                    <span>•</span>
+                    <button type="button" onClick={() => setTargetUrl('https://example.com')} className="hover:text-cyan-500 underline">https://example.com</button>
+                  </div>
+                </div>
+
+                {/* Diagnostic Logs */}
+                {urlScanResult?.scan_logs && (
+                  <div className="glass-card rounded-2xl p-4 font-mono text-xs space-y-2">
+                    <div className="flex items-center space-x-2 text-slate-400 text-[11px] border-b pb-2">
+                      <Icon name="terminal" size={14} className="text-cyan-500" />
+                      <span>Live Diagnostic Telemetry for {urlScanResult.target_url}</span>
+                    </div>
+                    <div className="max-h-36 overflow-y-auto space-y-1 text-slate-300">
+                      {urlScanResult.scan_logs.map((log, i) => (
+                        <div key={i} className="flex items-start space-x-2">
+                          <span className="text-cyan-500">›</span>
+                          <span>{log}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Real Findings List */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-bold text-sm flex items-center space-x-2">
+                      <Icon name="bug" size={16} className="text-rose-500" />
+                      <span>Real Findings Tracker ({urlScanResult?.findings?.length || 0} issues detected)</span>
+                    </h3>
+                  </div>
+
+                  {!urlScanResult && (
+                    <div className="glass-card rounded-2xl p-12 text-center space-y-3">
+                      <div className="h-12 w-12 rounded-full glass mx-auto flex items-center justify-center text-slate-400">
+                        <Icon name="shield" size={24} />
+                      </div>
+                      <h4 className="font-bold text-base">No Target Scanned Yet</h4>
+                      <p className="text-xs text-slate-400 max-w-md mx-auto">
+                        Enter a live URL above or tap the floating <strong>Voice Orb</strong> and say: <em>"Helios, kindly run it for me"</em>.
+                      </p>
+                    </div>
+                  )}
+
+                  {urlScanResult?.findings?.map((finding) => {
+                    const outcome = retestOutcome[finding.id];
+                    const isResolved = finding.status === 'RESOLVED' || outcome?.status === 'RESOLVED';
+
+                    return (
+                      <div
+                        key={finding.id}
+                        className={`glass-card rounded-2xl p-5 space-y-4 transition ${
+                          isResolved ? 'border-emerald-500/40' : 'border-rose-500/20'
+                        }`}
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b pb-3">
+                          <div className="space-y-1">
+                            <div className="flex items-center space-x-2">
+                              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-500/10 text-slate-400 border border-slate-500/20 font-bold">
+                                {finding.id}
+                              </span>
+                              <span className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded ${
+                                finding.severity === 'CRITICAL' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' :
+                                finding.severity === 'HIGH' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
+                                'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                              }`}>
+                                {finding.severity}
+                              </span>
+                              <span className={`text-[10px] font-mono px-2 py-0.5 rounded ${
+                                isResolved ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold' :
+                                'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
+                              }`}>
+                                {isResolved ? 'VERIFIED RESOLVED ✓' : `Confidence: ${finding.confidence}%`}
+                              </span>
+                            </div>
+                            <h4 className="font-bold text-base">{finding.title}</h4>
+                            <p className="text-xs text-slate-400 font-mono">{finding.affected_component}</p>
+                          </div>
+
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => handleRetestUrl(finding.id)}
+                              disabled={retestingId === finding.id}
+                              className="px-3 py-1.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-lg text-xs font-mono font-bold flex items-center space-x-1.5 shadow transition disabled:opacity-50"
+                            >
+                              <Icon name="refresh" size={13} className={retestingId === finding.id ? 'animate-spin' : ''} />
+                              <span>{retestingId === finding.id ? 'Probing Target...' : 'Run Real Re-Test'}</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Real Evidence */}
+                        <div className="space-y-1.5">
+                          <span className="text-[10px] uppercase font-mono tracking-wider text-slate-400">Actual Evidence Received:</span>
+                          <div className="glass-inner rounded-xl p-3 font-mono text-xs space-y-1">
+                            {finding.evidence.map((ev, i) => (
+                              <div key={i} className="flex items-start space-x-2 text-slate-300">
+                                <span className="text-cyan-500">▸</span>
+                                <span>{ev}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Explanation & Impact */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs leading-relaxed">
+                          <div className="glass-inner rounded-xl p-3 space-y-1">
+                            <span className="text-[10px] font-mono uppercase text-slate-400 font-bold">Why This Matters:</span>
+                            <p className="text-slate-300">{finding.technical_explanation}</p>
+                          </div>
+                          <div className="glass-inner rounded-xl p-3 space-y-1">
+                            <span className="text-[10px] font-mono uppercase text-slate-400 font-bold">Attack Path:</span>
+                            <p className="text-rose-400/90 font-mono text-[11px]">{finding.attack_path}</p>
+                            <p className="text-slate-400 mt-1">{finding.impact}</p>
+                          </div>
+                        </div>
+
+                        {/* Fix */}
+                        <div className="space-y-2">
+                          <span className="text-[10px] uppercase font-mono tracking-wider text-emerald-400 font-bold">Recommended Concrete Fix:</span>
+                          <pre className="glass-inner p-3 rounded-xl font-mono text-[11px] text-emerald-400 overflow-x-auto border border-emerald-500/20 leading-relaxed">
+                            {finding.remediation.secure_snippet}
+                          </pre>
+                        </div>
+
+                        {/* Re-Test Status Card */}
+                        {outcome && (
+                          <div className={`p-3 rounded-xl border font-mono text-xs ${
+                            outcome.status === 'RESOLVED' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+                          }`}>
+                            <div className="flex items-center space-x-1.5 font-bold">
+                              {outcome.status === 'RESOLVED' ? <Icon name="checkCircle" size={15} /> : <Icon name="alert" size={15} />}
+                              <span>RE-TEST STATUS: {outcome.status}</span>
+                              <span className="text-[10px] text-slate-400 ml-auto font-normal">{outcome.time}</span>
+                            </div>
+                            <div className="mt-1 text-[11px] text-slate-300">{outcome.note}</div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* TAB 2: INTERACTIVE LAB */}
+            {activeTab === 'lab' && (
+              <div className="space-y-6">
+                <div className="glass-card rounded-2xl p-6">
+                  <div className="flex items-center space-x-2 text-sm font-bold mb-1">
+                    <Icon name="code" size={18} className="text-cyan-500" />
+                    <span>Interactive Security Lab & Code Workbench</span>
+                  </div>
+                  <p className="text-xs text-slate-400">
+                    Live static vulnerability detection. Select a scenario, run analysis, apply fix, and re-test.
+                  </p>
+
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    {Object.keys(LAB_SCENARIOS).map(key => (
+                      <button
+                        key={key}
+                        onClick={() => {
+                          setLabScenario(key);
+                          setLabCode(LAB_SCENARIOS[key].vulnerable);
+                          setCodeScanResult(null);
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-mono transition ${
+                          labScenario === key ? 'bg-cyan-500 text-white font-bold' : 'glass text-slate-400 hover:text-slate-200'
+                        }`}
+                      >
+                        {LAB_SCENARIOS[key].name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <div className="glass-card rounded-2xl p-5 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-xs font-bold text-cyan-400">
+                        {LAB_SCENARIOS[labScenario].filename}
+                      </span>
+                      <button
+                        onClick={() => setLabCode(LAB_SCENARIOS[labScenario].fixed)}
+                        className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-mono font-semibold transition"
+                      >
+                        Load Recommended Fix
+                      </button>
+                    </div>
+
+                    <textarea
+                      rows={12}
+                      value={labCode}
+                      onChange={(e) => setLabCode(e.target.value)}
+                      className="w-full glass-inner p-3 rounded-xl font-mono text-xs focus:outline-none focus:ring-1 focus:ring-cyan-500 leading-relaxed"
+                    />
+
+                    <button
+                      onClick={handleScanLabCode}
+                      disabled={isScanningCode}
+                      className="w-full py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-xl text-xs font-bold font-mono flex items-center justify-center space-x-2 shadow transition"
+                    >
+                      <Icon name="play" size={13} />
+                      <span>{isScanningCode ? 'Analyzing Code...' : 'Run Real Static Code Analysis'}</span>
+                    </button>
+                  </div>
+
+                  <div className="glass-card rounded-2xl p-5 space-y-4">
+                    <h4 className="font-bold text-xs font-mono uppercase text-slate-400 tracking-wider">
+                      Live Code Telemetry
+                    </h4>
+
+                    {!codeScanResult && (
+                      <div className="glass-inner p-8 rounded-xl text-center text-xs text-slate-400">
+                        Click "Run Real Static Code Analysis" to inspect code for SQLi, exposed secrets, and prompt injection.
+                      </div>
+                    )}
+
+                    {codeScanResult?.findings?.length === 0 && (
+                      <div className="glass-inner p-6 rounded-xl text-center space-y-2 border border-emerald-500/40">
+                        <div className="text-emerald-400 font-bold font-mono text-sm flex items-center justify-center space-x-1.5">
+                          <Icon name="checkCircle" size={16} />
+                          <span>VERIFIED RESOLVED ✓</span>
+                        </div>
+                        <p className="text-xs text-slate-400">
+                          Re-test verification passed. Zero unescaped queries or exposed tokens detected.
+                        </p>
+                      </div>
+                    )}
+
+                    {codeScanResult?.findings?.map((f, i) => (
+                      <div key={i} className="glass-inner p-4 rounded-xl space-y-2 border border-rose-500/30">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 font-bold">
+                            {f.severity}
+                          </span>
+                          <span className="font-bold text-xs">{f.title}</span>
+                        </div>
+                        <p className="text-xs text-slate-400">{f.technical_explanation}</p>
+                        <div className="text-[11px] font-mono text-rose-400 bg-black/40 p-2 rounded">
+                          {f.vulnerable_code}
+                        </div>
+                        <div className="text-[11px] font-mono text-emerald-400">
+                          Fix: {f.remediation.recommended_fix}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 3: ATTACK PATHS */}
+            {activeTab === 'architecture' && (
+              <div className="space-y-6">
+                <div className="glass-card rounded-2xl p-6">
+                  <div className="flex items-center space-x-2 text-sm font-bold mb-1">
+                    <Icon name="branch" size={18} className="text-cyan-500" />
+                    <span>Attack-Path Engine & Exploit Graph</span>
+                  </div>
+                  <p className="text-xs text-slate-400">
+                    Maps how unencrypted transport and absent security headers chain into session interception.
+                  </p>
+
+                  <div className="mt-6 space-y-6">
+                    <div className="glass-inner rounded-xl p-5 space-y-4">
+                      <div className="flex items-center justify-between border-b pb-3">
+                        <div>
+                          <span className="text-xs font-mono text-cyan-400 font-bold">AP-01: Network Insecurity ➔ Man-in-the-Middle</span>
+                          <div className="text-xs text-slate-400">Triggered by missing HSTS</div>
+                        </div>
+                        <span className="text-xs font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 font-bold">
+                          Blast Radius: High
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                        <div className="glass p-3 rounded-lg text-center">
+                          <div className="text-[10px] font-mono text-slate-400">STEP 1</div>
+                          <div className="font-bold text-xs mt-1">Unsecured Wi-Fi</div>
+                          <div className="text-[10px] text-slate-500">Public Entry</div>
+                        </div>
+                        <div className="glass p-3 rounded-lg text-center border-amber-500/30">
+                          <div className="text-[10px] font-mono text-slate-400">STEP 2</div>
+                          <div className="font-bold text-xs mt-1">SSL Stripping</div>
+                          <div className="text-[10px] text-amber-400 font-mono">Missing HSTS</div>
+                        </div>
+                        <div className="glass p-3 rounded-lg text-center border-rose-500/30">
+                          <div className="text-[10px] font-mono text-slate-400">STEP 3</div>
+                          <div className="font-bold text-xs mt-1">Session Intercept</div>
+                          <div className="text-[10px] text-rose-400 font-mono">Plaintext HTTP</div>
+                        </div>
+                        <div className="glass p-3 rounded-lg text-center bg-rose-500/10 border-rose-500/50">
+                          <div className="text-[10px] font-mono text-rose-400 font-bold">CROWN JEWEL</div>
+                          <div className="font-bold text-xs mt-1">Account Takeover</div>
+                          <div className="text-[10px] text-rose-400">Stolen Auth Token</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 4: CISO REPORT */}
+            {activeTab === 'report' && (
+              <div className="glass-card rounded-2xl p-8 space-y-6">
+                <div className="flex items-center justify-between border-b pb-4">
+                  <div>
+                    <h2 className="text-xl font-bold">HELIOS CISO SECURITY AUDIT REPORT</h2>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Target: {urlScanResult?.target_url || 'Active Security Assessment'} • Date: {new Date().toLocaleDateString()}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => window.print()}
+                    className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-xl text-xs font-mono font-bold shadow no-print"
+                  >
+                    Print / Export PDF
+                  </button>
+                </div>
+
+                <div className="space-y-4 text-sm leading-relaxed">
+                  <p className="text-xs text-slate-400">
+                    Overall posture risk score: <strong>{currentRiskScore}/100 ({currentRiskLevel})</strong> based on real HTTP response data.
+                  </p>
+
+                  <div className="glass-inner p-4 rounded-xl grid grid-cols-2 md:grid-cols-4 gap-4 text-center font-mono">
+                    <div>
+                      <div className="text-2xl font-bold text-rose-500">{activeFindingsCount}</div>
+                      <div className="text-[10px] text-slate-400">Active Vulnerabilities</div>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-cyan-500">
+                        {urlScanResult?.headers_inspected ? Object.keys(urlScanResult.headers_inspected).length : 0}
+                      </div>
+                      <div className="text-[10px] text-slate-400">Headers Audited</div>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-emerald-500">{resolvedFindingsCount}</div>
+                      <div className="text-[10px] text-slate-400">Re-Tested & Resolved</div>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-indigo-500">100%</div>
+                      <div className="text-[10px] text-slate-400">Real Evidence Verified</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          </main>
+
+          {/* ─── REAL-TIME TWO-WAY VOICE COPILOT ORB ─── */}
+          <VoiceCopilot
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            currentUrl={targetUrl}
+            onTriggerScan={handleVoiceScanTrigger}
+            onTriggerRetest={handleVoiceRetestTrigger}
+            theme={theme}
+            toggleTheme={toggleTheme}
+          />
+
+          {/* ─── SETTINGS MODAL ─── */}
+          <SettingsModal
+            isOpen={isSettingsOpen}
+            onClose={() => setIsSettingsOpen(false)}
+          />
+
+          <footer className="glass px-6 py-3 border-t text-center text-xs font-mono text-slate-400 no-print flex items-center justify-between">
+            <span>HELIOS Autonomous Security Engineer • Gemini Brain & ElevenLabs Voice</span>
+            <span>Built with AI. Secured with HELIOS.</span>
+          </footer>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
