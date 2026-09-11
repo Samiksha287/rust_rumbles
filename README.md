@@ -55,7 +55,7 @@ KH001-TeamName/
 ├── screenshots/                  # High-resolution application UI screenshots
 │   ├── screenshot-1.png          # Real-world target tracker
 │   ├── screenshot-2.png          # Interactive security lab
-│   └── screenshot-3.png          # Real-time voice copilot
+│   
 └── data/                         # Security rules catalog and CWE datasets
     ├── README.md                 # Data documentation & zero fake data policy
     └── security_rules.json       # Security header benchmark rules
