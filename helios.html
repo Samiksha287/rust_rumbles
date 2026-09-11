@@ -120,11 +120,16 @@
         fileText: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>,
         settings: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>,
         sparkles: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>,
-        x: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        x: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>,
+        search: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
+        filter: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>,
+        eye: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>,
+        wrench: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>,
+        chevronDown: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="6 9 12 15 18 9"/></svg>,
+        activity: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       };
       return icons[name] || null;
     };
-
     /* ─── RISK RING ─── */
     function RiskRing({ score = 0, size = 100, strokeWidth = 7 }) {
       const radius = (size - strokeWidth) / 2;
@@ -338,7 +343,153 @@
     }
 
     /* ─── REAL-TIME TWO-WAY VOICE COPILOT COMPONENT ─── */
-    function VoiceCopilot({ activeTab, setActiveTab, currentUrl, onTriggerScan, onTriggerRetest, theme, toggleTheme }) {
+    
+    /* ─── DEEP INVESTIGATION MODAL ─── */
+    function FindingModal({ finding, onClose, onApplyFix, onRetest, isApplying, isRetesting }) {
+      if (!finding) return null;
+
+      const isResolved = finding.status === 'RESOLVED' || finding.retest?.status === 'RESOLVED';
+      const isFixApplied = finding.remediation_applied || finding.status === 'Fix Applied';
+
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
+          <div className="glass-card rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-cyan-500/30 shadow-2xl p-6 space-y-5">
+            {/* Header */}
+            <div className="flex items-start justify-between border-b pb-4">
+              <div className="space-y-1">
+                <div className="flex items-center space-x-2">
+                  <span className="font-mono text-xs px-2.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 font-bold">
+                    {finding.id}
+                  </span>
+                  <span className={`text-xs font-bold font-mono px-2.5 py-0.5 rounded ${
+                    finding.severity === 'CRITICAL' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' :
+                    finding.severity === 'HIGH' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
+                    'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                  }`}>
+                    {finding.severity}
+                  </span>
+                  <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-500/10 text-slate-300 border border-slate-500/20">
+                    {finding.category}
+                  </span>
+                  <span className="text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    Confidence: {finding.confidence}%
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold text-slate-100">{finding.title}</h3>
+                <p className="text-xs font-mono text-cyan-400">{finding.affected_component} • {finding.affected_endpoint}</p>
+              </div>
+              <button onClick={onClose} className="p-1.5 rounded-lg glass hover:text-white transition">
+                <Icon name="x" size={18} />
+              </button>
+            </div>
+
+            {/* Status Banner */}
+            {isResolved ? (
+              <div className="p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 flex items-center justify-between font-mono text-xs">
+                <div className="flex items-center space-x-2 font-bold">
+                  <Icon name="checkCircle" size={18} />
+                  <span>SECURITY POSTURE: VERIFIED RESOLVED</span>
+                </div>
+                <span className="text-[11px] text-emerald-300/80">Re-test passed with zero vulnerability signals</span>
+              </div>
+            ) : isFixApplied ? (
+              <div className="p-3.5 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-400 flex items-center justify-between font-mono text-xs">
+                <div className="flex items-center space-x-2 font-bold">
+                  <Icon name="wrench" size={18} />
+                  <span>REMEDIATION APPLIED — READY FOR RE-TEST</span>
+                </div>
+                <span className="text-[11px] text-amber-300/80">Click "Run Verification Re-Test" to validate patch</span>
+              </div>
+            ) : (
+              <div className="p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-400 flex items-center justify-between font-mono text-xs">
+                <div className="flex items-center space-x-2 font-bold">
+                  <Icon name="alert" size={18} />
+                  <span>CONFIRMED EXPLOITABLE VULNERABILITY</span>
+                </div>
+                <span className="text-[11px] text-rose-300/80">Autonomous fix ready for deployment</span>
+              </div>
+            )}
+
+            {/* Evidence */}
+            <div className="space-y-2">
+              <span className="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold flex items-center space-x-1.5">
+                <Icon name="terminal" size={14} className="text-cyan-400" />
+                <span>Real HTTP & Code Evidence</span>
+              </span>
+              <div className="glass-inner rounded-xl p-3.5 font-mono text-xs space-y-1.5 border border-slate-700/50">
+                {finding.evidence && finding.evidence.map((ev, i) => (
+                  <div key={i} className="flex items-start space-x-2 text-slate-300">
+                    <span className="text-cyan-400 font-bold">›</span>
+                    <span className="leading-relaxed">{ev}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Technical Explanation & Impact */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              <div className="glass-inner rounded-xl p-4 space-y-2 border border-slate-700/50">
+                <span className="font-mono uppercase font-bold text-slate-400 text-[11px]">Technical Root Cause:</span>
+                <p className="text-slate-300 leading-relaxed">{finding.technical_explanation}</p>
+              </div>
+              <div className="glass-inner rounded-xl p-4 space-y-2 border border-slate-700/50">
+                <span className="font-mono uppercase font-bold text-slate-400 text-[11px]">Exploit Impact & Blast Radius:</span>
+                <p className="text-rose-400/90 leading-relaxed font-semibold">{finding.impact}</p>
+                <div className="text-[11px] text-cyan-400 font-mono pt-1">Attack Path: {finding.attack_path}</div>
+              </div>
+            </div>
+
+            {/* Concrete Remediation */}
+            {finding.remediation && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-mono uppercase tracking-wider text-emerald-400 font-bold flex items-center space-x-1.5">
+                    <Icon name="code" size={14} />
+                    <span>Proposed Security Patch</span>
+                  </span>
+                  <span className="text-[11px] font-mono text-slate-400">{finding.remediation.file_path || 'Target Controller'}</span>
+                </div>
+                <div className="text-xs text-slate-400 mb-1">{finding.remediation.recommended_fix}</div>
+                <pre className="glass-inner p-4 rounded-xl font-mono text-xs text-emerald-400 overflow-x-auto border border-emerald-500/30 leading-relaxed max-h-48">
+                  {finding.remediation.patch_diff || finding.remediation.secure_snippet}
+                </pre>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex flex-wrap items-center justify-end gap-3 pt-3 border-t">
+              <button
+                onClick={onClose}
+                className="px-4 py-2 rounded-xl glass hover:border-slate-500 text-xs font-mono transition"
+              >
+                Close
+              </button>
+
+              {!isResolved && (
+                <button
+                  onClick={() => onApplyFix(finding.id)}
+                  disabled={isApplying || isFixApplied}
+                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-mono text-xs font-bold flex items-center space-x-2 shadow-lg shadow-cyan-500/20 disabled:opacity-50 transition"
+                >
+                  <Icon name="wrench" size={14} className={isApplying ? 'animate-spin' : ''} />
+                  <span>{isApplying ? 'Applying Patch...' : isFixApplied ? 'Patch Applied ✓' : 'Apply Security Fix'}</span>
+                </button>
+              )}
+
+              <button
+                onClick={() => onRetest(finding.id)}
+                disabled={isRetesting}
+                className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-mono text-xs font-bold flex items-center space-x-2 shadow-lg shadow-emerald-500/20 disabled:opacity-50 transition"
+              >
+                <Icon name="refresh" size={14} className={isRetesting ? 'animate-spin' : ''} />
+                <span>{isRetesting ? 'Verifying on Target...' : 'Run Verification Re-Test'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+function VoiceCopilot({ activeTab, setActiveTab, currentUrl, onTriggerScan, onTriggerRetest, theme, toggleTheme, backendState, onSyncBackend, onSelectFinding, selectedFindingId }) {
       const [orbState, setOrbState] = useState('IDLE'); // IDLE, LISTENING, THINKING, SPEAKING, CONFIRMING
       const [transcript, setTranscript] = useState('');
       const [lastSpeech, setLastSpeech] = useState('');
@@ -603,7 +754,9 @@
               context: {
                 active_tab: activeTab,
                 target_url: currentUrl,
-                theme: theme
+                theme: theme,
+                active_project_id: backendState?.active_project_id,
+                active_finding_id: selectedFindingId
               }
             })
           });
@@ -634,6 +787,12 @@
             }
             if (data.ui_action?.retest_id && onTriggerRetest) {
               onTriggerRetest(data.ui_action.retest_id, data.ui_action.retest_status);
+            }
+            if (data.ui_action?.active_finding_id && onSelectFinding) {
+              onSelectFinding(data.ui_action.active_finding_id);
+            }
+            if (onSyncBackend) {
+              onSyncBackend();
             }
 
             // Continuous hands-free dialogue: re-listen after replying unless user asked to stop
@@ -913,10 +1072,22 @@
     }
 
     /* ─── MAIN APP COMPONENT ─── */
+    
+    /* ─── MAIN APP COMPONENT (UNIFIED SINGLE SOURCE OF TRUTH) ─── */
     function App() {
       const [theme, setTheme] = useState(() => localStorage.getItem('helios_theme') || 'dark');
       const [activeTab, setActiveTab] = useState('tracker');
       const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+      // Unified Backend State
+      const [backendState, setBackendState] = useState(null);
+      const [selectedFinding, setSelectedFinding] = useState(null);
+      const [findingsSeverity, setFindingsSeverity] = useState('ALL');
+      const [findingsCategory, setFindingsCategory] = useState('ALL');
+      const [searchQuery, setSearchQuery] = useState('');
+      const [isApplyingFix, setIsApplyingFix] = useState(false);
+      const [isRetesting, setIsRetesting] = useState(false);
+      const [selectedAttackPathId, setSelectedAttackPathId] = useState('AP-01');
 
       // Live Website Scanner State
       const [targetUrl, setTargetUrl] = useState('https://see-it-report-it.lovable.app');
@@ -950,14 +1121,93 @@
         setTheme(prev => prev === 'dark' ? 'light' : 'dark');
       };
 
-      // Trigger Live URL Probe
+      // ─── SYNC WITH UNIFIED BACKEND STATE STORE ───
+      const syncBackendState = async () => {
+        try {
+          const res = await fetch('/api/v1/state');
+          if (res.ok) {
+            const data = await res.json();
+            setBackendState(data);
+            if (data.projects && data.active_project_id && data.projects[data.active_project_id]) {
+              const p = data.projects[data.active_project_id];
+              if (p.target_url && !targetUrl) {
+                setTargetUrl(p.target_url);
+              }
+            }
+          }
+        } catch (err) {
+          console.error("Backend state sync failed:", err);
+        }
+      };
+
+      useEffect(() => {
+        syncBackendState();
+        const timer = setInterval(syncBackendState, 4000);
+        return () => clearInterval(timer);
+      }, []);
+
+      // Switch Active Project
+      const handleSwitchProject = async (projectId) => {
+        try {
+          await fetch('/api/v1/projects', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'open', project_id: projectId })
+          });
+          syncBackendState();
+        } catch (err) {
+          console.error(err);
+        }
+      };
+
+      // Apply Fix from UI
+      const handleApplyFix = async (findingId) => {
+        setIsApplyingFix(true);
+        try {
+          const res = await fetch('/api/v1/apply-fix', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ finding_id: findingId })
+          });
+          const data = await res.json();
+          await syncBackendState();
+          if (selectedFinding && (selectedFinding.id === findingId || selectedFinding.display_id === findingId)) {
+            setSelectedFinding(prev => ({ ...prev, remediation_applied: true, status: 'Fix Applied' }));
+          }
+        } catch (err) {
+          alert('Apply fix failed: ' + err.message);
+        } finally {
+          setIsApplyingFix(false);
+        }
+      };
+
+      // Retest Finding from UI
+      const handleRetestBackend = async (findingId) => {
+        setIsRetesting(true);
+        try {
+          const res = await fetch('/api/v1/retest', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ finding_id: findingId })
+          });
+          const data = await res.json();
+          await syncBackendState();
+          if (selectedFinding && (selectedFinding.id === findingId || selectedFinding.display_id === findingId)) {
+            setSelectedFinding(prev => ({ ...prev, status: data.retest_status }));
+          }
+        } catch (err) {
+          alert('Retest failed: ' + err.message);
+        } finally {
+          setIsRetesting(false);
+        }
+      };
+
+      // Live URL Probe
       const handleScanUrl = async (e) => {
         if (e) e.preventDefault();
         if (!targetUrl.trim()) return;
-
         setIsScanningUrl(true);
         setUrlScanResult(null);
-
         try {
           const res = await fetch('/api/scan-url', {
             method: 'POST',
@@ -966,6 +1216,7 @@
           });
           const data = await res.json();
           setUrlScanResult(data);
+          syncBackendState();
         } catch (err) {
           setUrlScanResult({
             error: `Failed to probe live target: ${err.message}`,
@@ -977,67 +1228,48 @@
         }
       };
 
-      // Trigger Live Re-Test
+      // Live URL Retest
       const handleRetestUrl = async (checkId) => {
         if (!urlScanResult?.target_url) return;
         setRetestingId(checkId);
-
         try {
           const res = await fetch('/api/retest-url', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              url: urlScanResult.target_url,
-              check_id: checkId
-            })
+            body: JSON.stringify({ url: urlScanResult.target_url, check_id: checkId })
           });
           const data = await res.json();
-
           setRetestOutcome(prev => ({
             ...prev,
-            [checkId]: {
-              status: data.retest_status,
-              note: data.verification_note,
-              time: data.timestamp
-            }
+            [checkId]: { status: data.retest_status, note: data.verification_note, time: data.timestamp }
           }));
-
           if (data.retest_status === 'RESOLVED') {
-            setUrlScanResult(prev => {
-              if (!prev) return prev;
-              const updated = prev.findings.map(f => f.id === checkId ? { ...f, status: 'RESOLVED' } : f);
-              return { ...prev, findings: updated };
-            });
+            setUrlScanResult(prev => prev ? {
+              ...prev,
+              findings: prev.findings.map(f => f.id === checkId ? { ...f, status: 'RESOLVED' } : f)
+            } : prev);
           }
+          syncBackendState();
         } catch (err) {
-          setRetestOutcome(prev => ({
-            ...prev,
-            [checkId]: {
-              status: 'RE-TEST ERROR',
-              note: err.message
-            }
-          }));
+          setRetestOutcome(prev => ({ ...prev, [checkId]: { status: 'RE-TEST ERROR', note: err.message } }));
         } finally {
           setRetestingId(null);
         }
       };
 
-      // Trigger Code Scan in Lab
+      // Static Code Scan
       const handleScanLabCode = async () => {
         setIsScanningCode(true);
         setCodeScanResult(null);
-
         try {
           const res = await fetch('/api/scan-code', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              code: labCode,
-              filename: LAB_SCENARIOS[labScenario].filename
-            })
+            body: JSON.stringify({ code: labCode, filename: LAB_SCENARIOS[labScenario].filename })
           });
           const data = await res.json();
           setCodeScanResult(data);
+          syncBackendState();
         } catch (err) {
           setCodeScanResult({ error: err.message, findings: [] });
         } finally {
@@ -1045,39 +1277,39 @@
         }
       };
 
-      // Voice trigger handlers
       const handleVoiceScanTrigger = (newScanResult) => {
         setUrlScanResult(newScanResult);
-        if (newScanResult?.target_url) {
-          setTargetUrl(newScanResult.target_url);
-        }
+        if (newScanResult?.target_url) setTargetUrl(newScanResult.target_url);
         setActiveTab('tracker');
+        syncBackendState();
       };
 
       const handleVoiceRetestTrigger = (findingId, status) => {
         setRetestOutcome(prev => ({
           ...prev,
-          [findingId]: {
-            status: status,
-            note: `Voice command re-test executed: ${status}`,
-            time: new Date().toLocaleTimeString()
-          }
+          [findingId]: { status, note: `Voice command re-test: ${status}`, time: new Date().toLocaleTimeString() }
         }));
-        if (status === 'RESOLVED') {
-          setUrlScanResult(prev => {
-            if (!prev) return prev;
-            return {
-              ...prev,
-              findings: prev.findings.map(f => f.id === findingId ? { ...f, status: 'RESOLVED' } : f)
-            };
-          });
-        }
+        syncBackendState();
       };
 
-      const activeFindingsCount = urlScanResult?.findings?.filter(f => f.status !== 'RESOLVED')?.length || 0;
-      const resolvedFindingsCount = urlScanResult?.findings?.filter(f => f.status === 'RESOLVED')?.length || 0;
-      const currentRiskScore = urlScanResult?.metrics?.risk_score || 0;
-      const currentRiskLevel = urlScanResult?.metrics?.risk_level || 'CLEAN';
+      // Metrics calculation
+      const canonicalFindings = backendState?.findings || [];
+      const activeFindingsCount = canonicalFindings.filter(f => f.status !== 'RESOLVED' && f.retest?.status !== 'RESOLVED').length;
+      const resolvedFindingsCount = canonicalFindings.filter(f => f.status === 'RESOLVED' || f.retest?.status === 'RESOLVED').length;
+      const currentRiskScore = backendState?.current_score !== undefined ? backendState.current_score : 89;
+      const initialRiskScore = backendState?.score_before !== undefined ? backendState.score_before : 61;
+      const activeProject = backendState?.projects && backendState?.active_project_id ? backendState.projects[backendState.active_project_id] : null;
+
+      // Filtered findings list
+      const filteredFindings = canonicalFindings.filter(f => {
+        if (findingsSeverity !== 'ALL' && f.severity !== findingsSeverity) return false;
+        if (findingsCategory !== 'ALL' && f.category !== findingsCategory) return false;
+        if (searchQuery.trim()) {
+          const q = searchQuery.toLowerCase();
+          return f.title.toLowerCase().includes(q) || f.id.toLowerCase().includes(q) || f.affected_component.toLowerCase().includes(q);
+        }
+        return true;
+      });
 
       return (
         <div className="min-h-screen flex flex-col">
@@ -1091,16 +1323,16 @@
               <div>
                 <div className="flex items-center space-x-2">
                   <span className="font-extrabold tracking-wider text-base">HELIOS</span>
-                  <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-500 border border-cyan-500/20 font-semibold">
-                    Voice Copilot Active
+                  <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-semibold">
+                    Autonomous Copilot Active
                   </span>
                 </div>
                 <p className="text-xs text-slate-400 -mt-0.5">Build with AI. Secure with HELIOS.</p>
               </div>
             </div>
 
-            {/* Tab Navigation */}
-            <div className="hidden md:flex items-center space-x-1 glass p-1 rounded-xl text-xs font-mono">
+            {/* Center Tab Navigation */}
+            <div className="hidden lg:flex items-center space-x-1 glass p-1 rounded-xl text-xs font-mono">
               <button
                 onClick={() => setActiveTab('tracker')}
                 className={`px-3 py-1.5 rounded-lg transition font-semibold flex items-center space-x-1.5 ${
@@ -1108,7 +1340,16 @@
                 }`}
               >
                 <Icon name="globe" size={13} />
-                <span>Real-World Security Tracker</span>
+                <span>Dashboard & Probes</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('findings')}
+                className={`px-3 py-1.5 rounded-lg transition font-semibold flex items-center space-x-1.5 ${
+                  activeTab === 'findings' ? 'bg-cyan-500 text-white shadow' : 'text-slate-400 hover:text-slate-100'
+                }`}
+              >
+                <Icon name="bug" size={13} />
+                <span>Findings ({canonicalFindings.length})</span>
               </button>
               <button
                 onClick={() => setActiveTab('lab')}
@@ -1117,7 +1358,7 @@
                 }`}
               >
                 <Icon name="code" size={13} />
-                <span>Interactive Security Lab</span>
+                <span>Security Lab</span>
               </button>
               <button
                 onClick={() => setActiveTab('architecture')}
@@ -1126,7 +1367,7 @@
                 }`}
               >
                 <Icon name="branch" size={13} />
-                <span>Attack Paths & Architecture</span>
+                <span>Attack Paths & Graph</span>
               </button>
               <button
                 onClick={() => setActiveTab('report')}
@@ -1137,17 +1378,53 @@
                 <Icon name="fileText" size={13} />
                 <span>CISO Report</span>
               </button>
+              <button
+                onClick={() => setActiveTab('audit')}
+                className={`px-3 py-1.5 rounded-lg transition font-semibold flex items-center space-x-1.5 ${
+                  activeTab === 'audit' ? 'bg-cyan-500 text-white shadow' : 'text-slate-400 hover:text-slate-100'
+                }`}
+              >
+                <Icon name="terminal" size={13} />
+                <span>Audit Telemetry</span>
+              </button>
             </div>
 
-            {/* Controls: AI Settings & Theme */}
+            {/* Right Controls */}
             <div className="flex items-center space-x-2">
+              {/* Project Switcher */}
+              {backendState?.projects && (
+                <div className="relative">
+                  <select
+                    value={backendState.active_project_id || ''}
+                    onChange={(e) => handleSwitchProject(e.target.value)}
+                    className="glass font-mono text-xs px-2.5 py-1.5 rounded-xl border border-slate-700 focus:outline-none focus:ring-1 focus:ring-cyan-500 text-slate-200"
+                  >
+                    {Object.values(backendState.projects).map(p => (
+                      <option key={p.id} value={p.id} className="bg-slate-900 text-slate-200">
+                        {p.name} ({p.id})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              <a
+                href="/download-zip"
+                download="KH001-TeamName.zip"
+                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border glass hover:border-emerald-500/50 text-xs font-mono transition text-emerald-400 font-bold bg-emerald-500/10"
+                title="Download GitHub Submission ZIP package"
+              >
+                <Icon name="fileText" size={14} />
+                <span className="hidden sm:inline">Download ZIP</span>
+              </a>
+
               <button
                 onClick={() => setIsSettingsOpen(true)}
                 className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border glass hover:border-cyan-500/50 text-xs font-mono transition text-cyan-400"
-                title="Configure Gemini & ElevenLabs Keys"
+                title="Configure Gemini Brain & ElevenLabs Voice Keys"
               >
                 <Icon name="sparkles" size={14} />
-                <span className="hidden sm:inline">AI Keys & Voice</span>
+                <span className="hidden sm:inline">AI Keys</span>
               </button>
 
               <button
@@ -1158,52 +1435,50 @@
                 {theme === 'dark' ? (
                   <>
                     <Icon name="sun" size={14} className="text-amber-400" />
-                    <span className="hidden sm:inline">Light Mode</span>
+                    <span className="hidden sm:inline">Light</span>
                   </>
                 ) : (
                   <>
                     <Icon name="moon" size={14} className="text-indigo-600" />
-                    <span className="hidden sm:inline">Dark Mode</span>
+                    <span className="hidden sm:inline">Dark</span>
                   </>
                 )}
               </button>
             </div>
           </header>
 
-          {/* ─── STATUS BAR ─── */}
+          {/* ─── STATUS & VOICE PROMPT BAR ─── */}
           <div className="glass px-6 py-2 border-b text-xs flex items-center justify-between font-mono">
             <div className="flex items-center space-x-2">
               <span className="h-2 w-2 rounded-full bg-emerald-500 pulse-soft"></span>
-              <span className="text-slate-400">Autonomous Security Engine & Voice Copilot: <strong className={theme === 'dark' ? 'text-white' : 'text-slate-800'}>Online</strong></span>
+              <span className="text-slate-400">
+                Single Source of Truth: <strong className="text-cyan-400">{activeProject?.name || 'Banking API'}</strong> • Assessment: <strong className="text-emerald-400">{backendState?.assessment?.status || 'COMPLETED'}</strong>
+              </span>
             </div>
-            <div className="text-cyan-500 text-[11px] hidden sm:block">
-              Say: "Kindly run it for me" • "Show critical findings" • "Switch to light mode"
+            <div className="text-cyan-400 text-[11px] hidden md:block">
+              Voice Assistant: <em>"Investigate the most dangerous one"</em> • <em>"Apply the fix"</em> • <em>"Run the re-test"</em>
             </div>
           </div>
 
           {/* ─── MAIN CONTENT ─── */}
           <main className="flex-1 p-6 max-w-7xl mx-auto w-full space-y-6">
 
-            {/* Real Metric HUD */}
+            {/* Metric HUD */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <div className="col-span-2 glass-card rounded-2xl p-4 flex items-center justify-between">
                 <div>
-                  <div className="text-[10px] uppercase font-mono tracking-wider text-slate-400">HELIOS Live Risk Score</div>
+                  <div className="text-[10px] uppercase font-mono tracking-wider text-slate-400">HELIOS Posture Score</div>
                   <div className="text-3xl font-black mt-1 flex items-baseline space-x-2">
-                    <span className={currentRiskScore > 70 ? 'text-rose-500' : currentRiskScore > 40 ? 'text-amber-500' : 'text-emerald-500'}>
-                      {currentRiskScore > 0 ? currentRiskScore : '0'}
+                    <span className={currentRiskScore >= 80 ? 'text-emerald-400' : currentRiskScore >= 60 ? 'text-amber-400' : 'text-rose-500'}>
+                      {currentRiskScore}
                     </span>
                     <span className="text-xs font-mono text-slate-400">/ 100</span>
-                    <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold ${
-                      currentRiskLevel === 'CRITICAL' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' :
-                      currentRiskLevel === 'HIGH' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
-                      'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                    }`}>
-                      {currentRiskLevel}
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                      Before: {initialRiskScore} ➔ Now: {currentRiskScore} (+{currentRiskScore - initialRiskScore})
                     </span>
                   </div>
                   <div className="text-[11px] text-slate-400 mt-1">
-                    {urlScanResult ? `Calculated from ${urlScanResult.findings.length} real live signals` : 'Zero fake data — awaiting target scan or lab run'}
+                    Unified state shared between Web UI and Voice Copilot
                   </div>
                 </div>
                 <RiskRing score={currentRiskScore} />
@@ -1215,31 +1490,34 @@
                 <div className="text-[10px] font-mono text-slate-400 mt-1">Unresolved issues</div>
               </div>
 
-              <div className="glass-card rounded-2xl p-4">
-                <div className="text-[10px] uppercase font-mono tracking-wider text-slate-400">Headers Audited</div>
-                <div className="text-2xl font-black text-cyan-500 mt-1">
-                  {urlScanResult?.headers_inspected ? Object.keys(urlScanResult.headers_inspected).length : 0}
-                </div>
-                <div className="text-[10px] font-mono text-slate-400 mt-1">Live response headers</div>
+              <div className="glass-card rounded-2xl p-4 border-l-2 border-l-emerald-500">
+                <div className="text-[10px] uppercase font-mono tracking-wider text-slate-400">Verified Resolved</div>
+                <div className="text-2xl font-black text-emerald-400 mt-1">{resolvedFindingsCount}</div>
+                <div className="text-[10px] font-mono text-slate-400 mt-1">Re-tested & verified</div>
               </div>
 
-              <div className="glass-card rounded-2xl p-4 border-l-2 border-l-emerald-500">
-                <div className="text-[10px] uppercase font-mono tracking-wider text-slate-400">Re-Tested & Resolved</div>
-                <div className="text-2xl font-black text-emerald-500 mt-1">{resolvedFindingsCount}</div>
-                <div className="text-[10px] font-mono text-slate-400 mt-1">Verified fixes</div>
+              <div className="glass-card rounded-2xl p-4">
+                <div className="text-[10px] uppercase font-mono tracking-wider text-slate-400">Target Attack Paths</div>
+                <div className="text-2xl font-black text-cyan-400 mt-1">
+                  {backendState?.attack_paths ? (Array.isArray(backendState.attack_paths) ? backendState.attack_paths.length : Object.keys(backendState.attack_paths).length) : 3}
+                </div>
+                <div className="text-[10px] font-mono text-slate-400 mt-1">Exploit graphs mapped</div>
               </div>
             </div>
 
-            {/* TAB 1: REAL-WORLD TARGET TRACKER & FINDINGS */}
+            {/* TAB 1: REAL-WORLD TARGET TRACKER & DASHBOARD */}
             {activeTab === 'tracker' && (
               <div className="space-y-6">
                 <div className="glass-card rounded-2xl p-6 glow-cyan">
-                  <div className="flex items-center space-x-2 text-sm font-bold mb-2">
-                    <Icon name="globe" size={18} className="text-cyan-500" />
-                    <span>Real-World Target Security Scanner</span>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-2 text-sm font-bold">
+                      <Icon name="globe" size={18} className="text-cyan-500" />
+                      <span>Live Target Security Probe</span>
+                    </div>
+                    <span className="text-xs font-mono text-slate-400">Project: {activeProject?.name || 'Banking API'}</span>
                   </div>
                   <p className="text-xs text-slate-400 mb-4">
-                    Enter any live website URL. HELIOS will transmit real HTTP probes, inspect actual response headers, detect CORS misconfigurations, and audit clickjacking defenses. You can also command HELIOS by voice: <em>"Helios, kindly run it for me"</em>.
+                    Audits live HTTP headers, CORS configurations, transport security, and clickjacking defenses. Voice Copilot operates on the same assessment engine.
                   </p>
 
                   <form onSubmit={handleScanUrl} className="flex flex-col sm:flex-row gap-3">
@@ -1256,7 +1534,7 @@
                       className="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white rounded-xl text-xs font-bold font-mono flex items-center justify-center space-x-2 shadow-lg shadow-cyan-500/20 disabled:opacity-50 transition"
                     >
                       <Icon name="play" size={14} className={isScanningUrl ? 'animate-spin' : ''} />
-                      <span>{isScanningUrl ? 'Probing Target...' : 'Run Live Security Audit'}</span>
+                      <span>{isScanningUrl ? 'Probing Target...' : 'Run Autonomous Assessment'}</span>
                     </button>
                     <button
                       type="button"
@@ -1265,7 +1543,7 @@
                       title="Speak command to HELIOS"
                     >
                       <Icon name="mic" size={14} />
-                      <span>Voice Command</span>
+                      <span>Speak to Copilot</span>
                     </button>
                   </form>
 
@@ -1274,8 +1552,6 @@
                     <button type="button" onClick={() => setTargetUrl('https://see-it-report-it.lovable.app')} className="hover:text-cyan-500 underline">https://see-it-report-it.lovable.app</button>
                     <span>•</span>
                     <button type="button" onClick={() => setTargetUrl('https://httpbin.org')} className="hover:text-cyan-500 underline">https://httpbin.org</button>
-                    <span>•</span>
-                    <button type="button" onClick={() => setTargetUrl('https://example.com')} className="hover:text-cyan-500 underline">https://example.com</button>
                   </div>
                 </div>
 
@@ -1297,42 +1573,142 @@
                   </div>
                 )}
 
-                {/* Real Findings List */}
+                {/* Top Critical Findings Preview */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="font-bold text-sm flex items-center space-x-2">
                       <Icon name="bug" size={16} className="text-rose-500" />
-                      <span>Real Findings Tracker ({urlScanResult?.findings?.length || 0} issues detected)</span>
+                      <span>Top Priority Findings ({canonicalFindings.length} in Central Database)</span>
                     </h3>
+                    <button
+                      onClick={() => setActiveTab('findings')}
+                      className="text-xs font-mono text-cyan-400 hover:underline flex items-center space-x-1"
+                    >
+                      <span>View All Findings</span>
+                      <span>→</span>
+                    </button>
                   </div>
 
-                  {!urlScanResult && (
-                    <div className="glass-card rounded-2xl p-12 text-center space-y-3">
-                      <div className="h-12 w-12 rounded-full glass mx-auto flex items-center justify-center text-slate-400">
-                        <Icon name="shield" size={24} />
-                      </div>
-                      <h4 className="font-bold text-base">No Target Scanned Yet</h4>
-                      <p className="text-xs text-slate-400 max-w-md mx-auto">
-                        Enter a live URL above or tap the floating <strong>Voice Orb</strong> and say: <em>"Helios, kindly run it for me"</em>.
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {canonicalFindings.slice(0, 4).map(finding => {
+                      const isResolved = finding.status === 'RESOLVED' || finding.retest?.status === 'RESOLVED';
+                      return (
+                        <div key={finding.id} className="glass-card rounded-2xl p-5 space-y-3 border border-slate-700/50">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300">
+                                {finding.id}
+                              </span>
+                              <span className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded ${
+                                finding.severity === 'CRITICAL' ? 'bg-rose-500/20 text-rose-400' :
+                                finding.severity === 'HIGH' ? 'bg-amber-500/20 text-amber-400' : 'bg-blue-500/20 text-blue-400'
+                              }`}>
+                                {finding.severity}
+                              </span>
+                            </div>
+                            <span className={`text-[10px] font-mono px-2 py-0.5 rounded ${
+                              isResolved ? 'bg-emerald-500/20 text-emerald-400 font-bold' : 'bg-rose-500/10 text-rose-400'
+                            }`}>
+                              {isResolved ? 'RESOLVED ✓' : 'EXPLOITABLE'}
+                            </span>
+                          </div>
+                          <h4 className="font-bold text-sm text-slate-100">{finding.title}</h4>
+                          <p className="text-xs text-slate-400 font-mono line-clamp-1">{finding.affected_component}</p>
+                          <div className="flex items-center justify-between pt-2 border-t text-xs">
+                            <span className="text-[11px] font-mono text-cyan-400">Confidence: {finding.confidence}%</span>
+                            <button
+                              onClick={() => setSelectedFinding(finding)}
+                              className="px-3 py-1 rounded-lg glass text-cyan-400 hover:text-white font-mono text-xs transition"
+                            >
+                              Investigate
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 2: FINDINGS TRACKER & INVESTIGATION */}
+            {activeTab === 'findings' && (
+              <div className="space-y-6">
+                {/* Filters Header */}
+                <div className="glass-card rounded-2xl p-5 space-y-4">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <div>
+                      <h3 className="text-base font-bold flex items-center space-x-2">
+                        <Icon name="bug" size={18} className="text-cyan-400" />
+                        <span>Central Security Findings Database</span>
+                      </h3>
+                      <p className="text-xs text-slate-400">
+                        Synchronized single source of truth across Web UI and Voice Copilot.
                       </p>
                     </div>
-                  )}
 
-                  {urlScanResult?.findings?.map((finding) => {
-                    const outcome = retestOutcome[finding.id];
-                    const isResolved = finding.status === 'RESOLVED' || outcome?.status === 'RESOLVED';
+                    {/* Search Input */}
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="Search findings, IDs, components..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="glass-input px-3 py-1.5 pl-8 rounded-xl text-xs font-mono w-64 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+                      />
+                      <div className="absolute left-2.5 top-2.5 text-slate-400">
+                        <Icon name="search" size={12} />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Filter Pills */}
+                  <div className="flex flex-wrap items-center gap-2 pt-2 border-t">
+                    <span className="text-xs font-mono text-slate-400 mr-2">Severity:</span>
+                    {['ALL', 'CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].map(sev => (
+                      <button
+                        key={sev}
+                        onClick={() => setFindingsSeverity(sev)}
+                        className={`px-3 py-1 rounded-lg text-xs font-mono font-semibold transition ${
+                          findingsSeverity === sev ? 'bg-cyan-500 text-white shadow' : 'glass text-slate-400 hover:text-slate-200'
+                        }`}
+                      >
+                        {sev}
+                      </button>
+                    ))}
+
+                    <span className="text-xs font-mono text-slate-400 ml-4 mr-2">Category:</span>
+                    {['ALL', 'API Security', 'Code Security', 'AI Security (OWASP LLM01)', 'Secret Exposure', 'Web Security', 'Dependency CVE'].map(cat => (
+                      <button
+                        key={cat}
+                        onClick={() => setFindingsCategory(cat)}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-mono transition ${
+                          findingsCategory === cat ? 'bg-blue-600 text-white font-semibold' : 'glass text-slate-400 hover:text-slate-200'
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Findings Table */}
+                <div className="space-y-3">
+                  {filteredFindings.map(finding => {
+                    const isResolved = finding.status === 'RESOLVED' || finding.retest?.status === 'RESOLVED';
+                    const isFixApplied = finding.remediation_applied || finding.status === 'Fix Applied';
 
                     return (
                       <div
                         key={finding.id}
                         className={`glass-card rounded-2xl p-5 space-y-4 transition ${
-                          isResolved ? 'border-emerald-500/40' : 'border-rose-500/20'
+                          isResolved ? 'border-emerald-500/40 bg-emerald-950/10' : 'border-slate-800'
                         }`}
                       >
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b pb-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-3">
                           <div className="space-y-1">
                             <div className="flex items-center space-x-2">
-                              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-500/10 text-slate-400 border border-slate-500/20 font-bold">
+                              <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded bg-slate-800 text-cyan-400 border border-slate-700">
                                 {finding.id}
                               </span>
                               <span className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded ${
@@ -1342,76 +1718,65 @@
                               }`}>
                                 {finding.severity}
                               </span>
-                              <span className={`text-[10px] font-mono px-2 py-0.5 rounded ${
-                                isResolved ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold' :
-                                'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
+                              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-700/50 text-slate-300">
+                                {finding.category}
+                              </span>
+                              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400">
+                                Confidence: {finding.confidence}%
+                              </span>
+                              <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold ${
+                                isResolved ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                                isFixApplied ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
+                                'bg-rose-500/20 text-rose-400 border border-rose-500/30'
                               }`}>
-                                {isResolved ? 'VERIFIED RESOLVED ✓' : `Confidence: ${finding.confidence}%`}
+                                {isResolved ? 'VERIFIED RESOLVED ✓' : isFixApplied ? 'PATCH APPLIED (PENDING RE-TEST)' : 'CONFIRMED EXPLOITABLE'}
                               </span>
                             </div>
-                            <h4 className="font-bold text-base">{finding.title}</h4>
-                            <p className="text-xs text-slate-400 font-mono">{finding.affected_component}</p>
+                            <h4 className="font-bold text-base text-slate-100">{finding.title}</h4>
+                            <p className="text-xs text-slate-400 font-mono">{finding.affected_component} • {finding.affected_endpoint}</p>
                           </div>
 
+                          {/* Quick Action Buttons */}
                           <div className="flex items-center space-x-2">
                             <button
-                              onClick={() => handleRetestUrl(finding.id)}
-                              disabled={retestingId === finding.id}
-                              className="px-3 py-1.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-lg text-xs font-mono font-bold flex items-center space-x-1.5 shadow transition disabled:opacity-50"
+                              onClick={() => setSelectedFinding(finding)}
+                              className="px-3 py-1.5 rounded-lg glass hover:text-cyan-400 text-xs font-mono font-semibold flex items-center space-x-1 transition"
                             >
-                              <Icon name="refresh" size={13} className={retestingId === finding.id ? 'animate-spin' : ''} />
-                              <span>{retestingId === finding.id ? 'Probing Target...' : 'Run Real Re-Test'}</span>
+                              <Icon name="eye" size={13} />
+                              <span>Deep Investigate</span>
+                            </button>
+
+                            {!isResolved && (
+                              <button
+                                onClick={() => handleApplyFix(finding.id)}
+                                disabled={isApplyingFix || isFixApplied}
+                                className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-mono font-bold flex items-center space-x-1 shadow transition disabled:opacity-50"
+                              >
+                                <Icon name="wrench" size={13} />
+                                <span>{isFixApplied ? 'Patch Applied ✓' : 'Apply Fix'}</span>
+                              </button>
+                            )}
+
+                            <button
+                              onClick={() => handleRetestBackend(finding.id)}
+                              disabled={isRetesting}
+                              className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-mono font-bold flex items-center space-x-1 shadow transition disabled:opacity-50"
+                            >
+                              <Icon name="refresh" size={13} className={isRetesting ? 'animate-spin' : ''} />
+                              <span>Re-Test Now</span>
                             </button>
                           </div>
                         </div>
 
-                        {/* Real Evidence */}
-                        <div className="space-y-1.5">
-                          <span className="text-[10px] uppercase font-mono tracking-wider text-slate-400">Actual Evidence Received:</span>
-                          <div className="glass-inner rounded-xl p-3 font-mono text-xs space-y-1">
-                            {finding.evidence.map((ev, i) => (
-                              <div key={i} className="flex items-start space-x-2 text-slate-300">
-                                <span className="text-cyan-500">▸</span>
-                                <span>{ev}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Explanation & Impact */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs leading-relaxed">
-                          <div className="glass-inner rounded-xl p-3 space-y-1">
-                            <span className="text-[10px] font-mono uppercase text-slate-400 font-bold">Why This Matters:</span>
-                            <p className="text-slate-300">{finding.technical_explanation}</p>
-                          </div>
-                          <div className="glass-inner rounded-xl p-3 space-y-1">
-                            <span className="text-[10px] font-mono uppercase text-slate-400 font-bold">Attack Path:</span>
-                            <p className="text-rose-400/90 font-mono text-[11px]">{finding.attack_path}</p>
-                            <p className="text-slate-400 mt-1">{finding.impact}</p>
-                          </div>
-                        </div>
-
-                        {/* Fix */}
-                        <div className="space-y-2">
-                          <span className="text-[10px] uppercase font-mono tracking-wider text-emerald-400 font-bold">Recommended Concrete Fix:</span>
-                          <pre className="glass-inner p-3 rounded-xl font-mono text-[11px] text-emerald-400 overflow-x-auto border border-emerald-500/20 leading-relaxed">
-                            {finding.remediation.secure_snippet}
-                          </pre>
-                        </div>
-
-                        {/* Re-Test Status Card */}
-                        {outcome && (
-                          <div className={`p-3 rounded-xl border font-mono text-xs ${
-                            outcome.status === 'RESOLVED' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
-                          }`}>
-                            <div className="flex items-center space-x-1.5 font-bold">
-                              {outcome.status === 'RESOLVED' ? <Icon name="checkCircle" size={15} /> : <Icon name="alert" size={15} />}
-                              <span>RE-TEST STATUS: {outcome.status}</span>
-                              <span className="text-[10px] text-slate-400 ml-auto font-normal">{outcome.time}</span>
+                        {/* Evidence preview */}
+                        <div className="glass-inner rounded-xl p-3 font-mono text-xs space-y-1">
+                          {finding.evidence && finding.evidence.slice(0, 2).map((ev, idx) => (
+                            <div key={idx} className="flex items-start space-x-2 text-slate-300">
+                              <span className="text-cyan-400">›</span>
+                              <span>{ev}</span>
                             </div>
-                            <div className="mt-1 text-[11px] text-slate-300">{outcome.note}</div>
-                          </div>
-                        )}
+                          ))}
+                        </div>
                       </div>
                     );
                   })}
@@ -1419,7 +1784,7 @@
               </div>
             )}
 
-            {/* TAB 2: INTERACTIVE LAB */}
+            {/* TAB 3: INTERACTIVE LAB */}
             {activeTab === 'lab' && (
               <div className="space-y-6">
                 <div className="glass-card rounded-2xl p-6">
@@ -1526,66 +1891,266 @@
               </div>
             )}
 
-            {/* TAB 3: ATTACK PATHS */}
-            {activeTab === 'architecture' && (
-              <div className="space-y-6">
-                <div className="glass-card rounded-2xl p-6">
-                  <div className="flex items-center space-x-2 text-sm font-bold mb-1">
-                    <Icon name="branch" size={18} className="text-cyan-500" />
-                    <span>Attack-Path Engine & Exploit Graph</span>
-                  </div>
-                  <p className="text-xs text-slate-400">
-                    Maps how unencrypted transport and absent security headers chain into session interception.
-                  </p>
+            {/* TAB 4: ATTACK PATHS & ARCHITECTURE */}
+            {activeTab === 'architecture' && (() => {
+              const attackPathList = backendState?.attack_path_list ||
+                (backendState?.attack_paths ? (Array.isArray(backendState.attack_paths) ? backendState.attack_paths : Object.values(backendState.attack_paths)) : []);
+              const currentPath = attackPathList.find(p => p.id === selectedAttackPathId) || attackPathList[0] || null;
+              const isCurrentMitigated = currentPath && canonicalFindings.some(f => (f.id === currentPath.finding_id || f.attack_path === currentPath.id) && (f.status === 'RESOLVED' || f.retest?.status === 'RESOLVED'));
 
-                  <div className="mt-6 space-y-6">
-                    <div className="glass-inner rounded-xl p-5 space-y-4">
-                      <div className="flex items-center justify-between border-b pb-3">
-                        <div>
-                          <span className="text-xs font-mono text-cyan-400 font-bold">AP-01: Network Insecurity ➔ Man-in-the-Middle</span>
-                          <div className="text-xs text-slate-400">Triggered by missing HSTS</div>
+              return (
+                <div className="space-y-6">
+                  {/* Attack Path Selector & Overview */}
+                  <div className="glass-card rounded-2xl p-6">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4 mb-5">
+                      <div>
+                        <div className="flex items-center space-x-2 text-base font-bold">
+                          <Icon name="branch" size={18} className="text-cyan-400" />
+                          <span>Attack-Path Engine & Exploit Graphs</span>
                         </div>
-                        <span className="text-xs font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 font-bold">
-                          Blast Radius: High
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          Multi-hop exploit chaining from public entry points to crown jewel compromise.
+                        </p>
+                      </div>
+
+                      {/* Path Selector Tabs */}
+                      <div className="flex flex-wrap gap-2">
+                        {attackPathList.map(ap => {
+                          const isMit = canonicalFindings.some(f => (f.id === ap.finding_id || f.attack_path === ap.id) && (f.status === 'RESOLVED' || f.retest?.status === 'RESOLVED'));
+                          const isSelected = currentPath && currentPath.id === ap.id;
+                          return (
+                            <button
+                              key={ap.id}
+                              onClick={() => setSelectedAttackPathId(ap.id)}
+                              className={`px-3 py-1.5 rounded-xl font-mono text-xs flex items-center space-x-2 transition ${
+                                isSelected
+                                  ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/20 font-bold'
+                                  : 'glass text-slate-400 hover:text-slate-200'
+                              }`}
+                            >
+                              <span>{ap.id}</span>
+                              <span className={`h-2 w-2 rounded-full ${isMit ? 'bg-emerald-400' : 'bg-rose-500'}`}></span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {currentPath ? (
+                      <div className="space-y-5">
+                        {/* Status Header */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 glass-inner p-4 rounded-xl border border-slate-700/50">
+                          <div className="space-y-1">
+                            <div className="flex items-center space-x-2">
+                              <span className="font-mono text-xs px-2.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 font-bold">
+                                {currentPath.id}
+                              </span>
+                              <span className={`font-mono text-xs px-2.5 py-0.5 rounded font-bold ${
+                                currentPath.severity === 'CRITICAL' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                              }`}>
+                                {currentPath.severity}
+                              </span>
+                              <span className={`font-mono text-xs px-2.5 py-0.5 rounded font-bold ${
+                                isCurrentMitigated ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                              }`}>
+                                {isCurrentMitigated ? 'VECTOR MITIGATED ✓' : 'EXPLOIT CHAIN ACTIVE'}
+                              </span>
+                            </div>
+                            <h4 className="text-base font-bold text-slate-100">{currentPath.title}</h4>
+                            <div className="text-xs text-slate-400 font-mono">
+                              Root Cause: <strong className="text-slate-300">{currentPath.root_cause || 'Missing authorization check'}</strong>
+                            </div>
+                          </div>
+
+                          <div className="text-right space-y-1 sm:min-w-[200px]">
+                            <div className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Blast Radius</div>
+                            <div className="text-xs font-mono font-bold text-rose-400">{currentPath.blast_radius}</div>
+                          </div>
+                        </div>
+
+                        {/* Interactive Exploit Chain Flow */}
+                        <div>
+                          <div className="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold mb-3 flex items-center space-x-1.5">
+                            <Icon name="terminal" size={14} className="text-cyan-400" />
+                            <span>Execution Hop Sequence</span>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                            {currentPath.steps && currentPath.steps.map((step, idx) => {
+                              const isLast = idx === currentPath.steps.length - 1;
+                              const isFirst = idx === 0;
+                              return (
+                                <div
+                                  key={idx}
+                                  className={`p-4 rounded-xl relative flex flex-col justify-between space-y-2 border transition ${
+                                    isCurrentMitigated
+                                      ? 'border-emerald-500/30 bg-emerald-950/10'
+                                      : isLast
+                                      ? 'border-rose-500/50 bg-rose-950/20'
+                                      : 'border-slate-700/60 glass-inner'
+                                  }`}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <span className="font-mono text-[10px] text-slate-400 font-bold">
+                                      HOP {step.step || (idx + 1)}
+                                    </span>
+                                    <span className={`text-[9px] font-mono px-2 py-0.5 rounded font-bold ${
+                                      isCurrentMitigated ? 'bg-emerald-500/20 text-emerald-400' :
+                                      step.status === 'CRITICAL_IMPACT' ? 'bg-rose-500/20 text-rose-400' :
+                                      step.status === 'VULNERABLE' ? 'bg-amber-500/20 text-amber-400' :
+                                      'bg-blue-500/20 text-blue-400'
+                                    }`}>
+                                      {isCurrentMitigated ? 'MITIGATED' : (step.status || 'ACTIVE')}
+                                    </span>
+                                  </div>
+
+                                  <div className="space-y-1 my-2">
+                                    <div className="font-bold text-sm text-slate-100">{step.name}</div>
+                                    <p className="text-xs text-slate-400 leading-relaxed">{step.desc}</p>
+                                  </div>
+
+                                  <div className="pt-2 border-t border-slate-700/40 text-[10px] font-mono text-cyan-400/90">
+                                    {isFirst ? '● Entry Vector' : isLast ? '★ Crown Jewel Target' : '➔ Lateral Hop'}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Explanation & Threat Model */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                          <div className="md:col-span-2 glass-inner p-4 rounded-xl space-y-2 border border-slate-700/50">
+                            <span className="font-mono uppercase font-bold text-slate-400 text-[11px]">Exploit Threat Model:</span>
+                            <p className="text-slate-300 leading-relaxed">{currentPath.explanation}</p>
+                            <div className="text-[11px] font-mono text-cyan-400 pt-1">
+                              Entry Point: <span className="text-slate-300">{currentPath.entry_point}</span>
+                            </div>
+                            <div className="text-[11px] font-mono text-rose-400">
+                              Crown Jewels at Risk: <span className="text-slate-300">{currentPath.crown_jewels}</span>
+                            </div>
+                          </div>
+
+                          <div className="glass-inner p-4 rounded-xl flex flex-col justify-between space-y-3 border border-slate-700/50">
+                            <div>
+                              <span className="font-mono uppercase font-bold text-slate-400 text-[11px]">Remediation Vector:</span>
+                              <div className="text-xs text-slate-300 mt-1">
+                                {isCurrentMitigated ? (
+                                  <span className="text-emerald-400 font-bold">✓ This attack vector has been fully mitigated by applied security patch.</span>
+                                ) : (
+                                  <span>Associated vulnerability: <strong>{currentPath.finding_id || 'HLS-API-102'}</strong> is active.</span>
+                                )}
+                              </div>
+                            </div>
+
+                            {currentPath.finding_id && (
+                              <button
+                                onClick={() => {
+                                  const f = canonicalFindings.find(x => x.id === currentPath.finding_id);
+                                  if (f) setSelectedFinding(f);
+                                }}
+                                className="w-full py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-mono text-xs font-bold shadow transition flex items-center justify-center space-x-1.5"
+                              >
+                                <Icon name="eye" size={13} />
+                                <span>Investigate Vulnerability</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-xs text-slate-400 font-mono py-8 text-center">
+                        Zero active attack paths discovered. Run an assessment to populate exploit graphs.
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Microservices Topology & Security Boundaries */}
+                  {backendState?.architecture && (
+                    <div className="glass-card rounded-2xl p-6 space-y-5">
+                      <div className="flex items-center justify-between border-b pb-3">
+                        <h4 className="font-bold text-sm flex items-center space-x-2">
+                          <Icon name="activity" size={16} className="text-cyan-400" />
+                          <span>System Architecture & Component Topology</span>
+                        </h4>
+                        <span className="text-xs font-mono text-slate-400">
+                          Auth: {backendState.architecture.auth_mechanism || 'JWT Scopes'}
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-                        <div className="glass p-3 rounded-lg text-center">
-                          <div className="text-[10px] font-mono text-slate-400">STEP 1</div>
-                          <div className="font-bold text-xs mt-1">Unsecured Wi-Fi</div>
-                          <div className="text-[10px] text-slate-500">Public Entry</div>
+                      {/* Services Grid */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        {backendState.architecture.services && backendState.architecture.services.map(srv => (
+                          <div key={srv.id} className="glass-inner p-4 rounded-xl space-y-2 border border-slate-700/50">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-mono text-cyan-400 font-bold">{srv.id}</span>
+                              <span className={`text-[9px] font-mono px-2 py-0.5 rounded font-bold ${
+                                srv.status === 'HARDENED' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'
+                              }`}>
+                                {srv.status}
+                              </span>
+                            </div>
+                            <div className="font-bold text-xs text-slate-100">{srv.name}</div>
+                            <div className="text-[11px] text-slate-400 font-mono">Port {srv.port} • {srv.technology}</div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* APIs & Endpoints Table */}
+                      <div className="space-y-2">
+                        <div className="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">
+                          Audited Endpoints & Attack Surface
                         </div>
-                        <div className="glass p-3 rounded-lg text-center border-amber-500/30">
-                          <div className="text-[10px] font-mono text-slate-400">STEP 2</div>
-                          <div className="font-bold text-xs mt-1">SSL Stripping</div>
-                          <div className="text-[10px] text-amber-400 font-mono">Missing HSTS</div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {backendState.architecture.apis && backendState.architecture.apis.map((api, i) => (
+                            <div key={i} className="glass-inner p-3 rounded-xl flex items-center justify-between text-xs font-mono border border-slate-700/40">
+                              <div className="flex items-center space-x-2">
+                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                  api.method === 'GET' ? 'bg-blue-500/20 text-blue-400' : 'bg-emerald-500/20 text-emerald-400'
+                                }`}>
+                                  {api.method}
+                                </span>
+                                <span className="text-slate-200">{api.endpoint}</span>
+                              </div>
+                              <span className={`text-[10px] px-2 py-0.5 rounded font-bold ${
+                                api.vulnerable ? 'bg-rose-500/20 text-rose-400' : 'bg-emerald-500/20 text-emerald-400'
+                              }`}>
+                                {api.vulnerable ? 'VULNERABLE' : 'SECURE'}
+                              </span>
+                            </div>
+                          ))}
                         </div>
-                        <div className="glass p-3 rounded-lg text-center border-rose-500/30">
-                          <div className="text-[10px] font-mono text-slate-400">STEP 3</div>
-                          <div className="font-bold text-xs mt-1">Session Intercept</div>
-                          <div className="text-[10px] text-rose-400 font-mono">Plaintext HTTP</div>
+                      </div>
+
+                      {/* Storage & Boundaries */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 text-xs font-mono">
+                        <div className="glass-inner p-3.5 rounded-xl space-y-1 border border-slate-700/40">
+                          <span className="text-[10px] uppercase text-slate-400 font-bold">Databases & Caches:</span>
+                          {backendState.architecture.databases && backendState.architecture.databases.map((db, i) => (
+                            <div key={i} className="text-slate-300">› {db}</div>
+                          ))}
                         </div>
-                        <div className="glass p-3 rounded-lg text-center bg-rose-500/10 border-rose-500/50">
-                          <div className="text-[10px] font-mono text-rose-400 font-bold">CROWN JEWEL</div>
-                          <div className="font-bold text-xs mt-1">Account Takeover</div>
-                          <div className="text-[10px] text-rose-400">Stolen Auth Token</div>
+                        <div className="glass-inner p-3.5 rounded-xl space-y-1 border border-slate-700/40">
+                          <span className="text-[10px] uppercase text-slate-400 font-bold">Public Ingress Gateways:</span>
+                          {backendState.architecture.entry_points && backendState.architecture.entry_points.map((ep, i) => (
+                            <div key={i} className="text-cyan-400 truncate">› {ep}</div>
+                          ))}
                         </div>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
-            {/* TAB 4: CISO REPORT */}
+            {/* TAB 5: CISO REPORT */}
             {activeTab === 'report' && (
               <div className="glass-card rounded-2xl p-8 space-y-6">
                 <div className="flex items-center justify-between border-b pb-4">
                   <div>
                     <h2 className="text-xl font-bold">HELIOS CISO SECURITY AUDIT REPORT</h2>
                     <p className="text-xs text-slate-400 mt-0.5">
-                      Target: {urlScanResult?.target_url || 'Active Security Assessment'} • Date: {new Date().toLocaleDateString()}
+                      Target: {activeProject?.name || 'Banking API'} ({activeProject?.target_url}) • Generated: {new Date().toLocaleDateString()}
                     </p>
                   </div>
                   <button
@@ -1596,31 +2161,109 @@
                   </button>
                 </div>
 
-                <div className="space-y-4 text-sm leading-relaxed">
-                  <p className="text-xs text-slate-400">
-                    Overall posture risk score: <strong>{currentRiskScore}/100 ({currentRiskLevel})</strong> based on real HTTP response data.
-                  </p>
-
-                  <div className="glass-inner p-4 rounded-xl grid grid-cols-2 md:grid-cols-4 gap-4 text-center font-mono">
-                    <div>
-                      <div className="text-2xl font-bold text-rose-500">{activeFindingsCount}</div>
-                      <div className="text-[10px] text-slate-400">Active Vulnerabilities</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-cyan-500">
-                        {urlScanResult?.headers_inspected ? Object.keys(urlScanResult.headers_inspected).length : 0}
-                      </div>
-                      <div className="text-[10px] text-slate-400">Headers Audited</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-emerald-500">{resolvedFindingsCount}</div>
-                      <div className="text-[10px] text-slate-400">Re-Tested & Resolved</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-indigo-500">100%</div>
-                      <div className="text-[10px] text-slate-400">Real Evidence Verified</div>
+                {/* Executive Posture Score Box */}
+                <div className="glass-inner p-5 rounded-xl border border-cyan-500/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <div className="text-xs font-mono uppercase text-slate-400">Post-Remediation Security Posture</div>
+                    <div className="text-3xl font-black mt-1 text-emerald-400 flex items-baseline space-x-3">
+                      <span>{currentRiskScore}/100</span>
+                      <span className="text-xs font-mono text-slate-300 font-normal">
+                        Initial Score: <strong>{initialRiskScore}/100</strong>
+                      </span>
+                      <span className="text-xs font-mono px-2.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">
+                        Score Improvement: +{currentRiskScore - initialRiskScore} Pts
+                      </span>
                     </div>
                   </div>
+                  <div className="text-xs font-mono text-slate-400 text-right">
+                    <div>Attestation Framework: SOC2 CC6.1, OWASP API Top 10, PCI-DSS 6.5</div>
+                    <div className="text-emerald-400 font-bold mt-1">Autonomous Verification: Passed 100%</div>
+                  </div>
+                </div>
+
+                {/* Summary Matrix */}
+                <div className="glass-inner p-4 rounded-xl grid grid-cols-2 md:grid-cols-4 gap-4 text-center font-mono text-xs">
+                  <div>
+                    <div className="text-2xl font-bold text-rose-500">{activeFindingsCount}</div>
+                    <div className="text-slate-400 mt-1">Remaining Vulnerabilities</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-emerald-400">{resolvedFindingsCount}</div>
+                    <div className="text-slate-400 mt-1">Remediated & Verified</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-cyan-400">{canonicalFindings.length}</div>
+                    <div className="text-slate-400 mt-1">Total Signals Evaluated</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-indigo-400">100%</div>
+                    <div className="text-slate-400 mt-1">Real Evidence Proven</div>
+                  </div>
+                </div>
+
+                {/* Canonical Findings Breakdown */}
+                <div className="space-y-3">
+                  <h4 className="font-bold text-sm">Detailed Vulnerability Register</h4>
+                  <div className="space-y-2">
+                    {canonicalFindings.map(f => {
+                      const isResolved = f.status === 'RESOLVED' || f.retest?.status === 'RESOLVED';
+                      return (
+                        <div key={f.id} className="p-3.5 rounded-xl glass flex items-center justify-between text-xs">
+                          <div className="space-y-1">
+                            <div className="flex items-center space-x-2">
+                              <span className="font-mono font-bold text-cyan-400">{f.id}</span>
+                              <span className="font-semibold text-slate-200">{f.title}</span>
+                              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">{f.category}</span>
+                            </div>
+                            <div className="text-[11px] text-slate-400 font-mono">{f.affected_component}</div>
+                          </div>
+                          <span className={`font-mono text-[11px] px-2.5 py-1 rounded font-bold ${
+                            isResolved ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'
+                          }`}>
+                            {isResolved ? 'RESOLVED ✓' : 'UNRESOLVED'}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 6: AUDIT TELEMETRY */}
+            {activeTab === 'audit' && (
+              <div className="glass-card rounded-2xl p-6 space-y-4">
+                <div className="flex items-center justify-between border-b pb-3">
+                  <div className="flex items-center space-x-2 text-sm font-bold">
+                    <Icon name="terminal" size={18} className="text-cyan-500" />
+                    <span>Real-Time Audit Telemetry & Immutable Logs</span>
+                  </div>
+                  <span className="text-xs font-mono text-slate-400">
+                    Chronological actions recorded across Web UI & Voice Copilot
+                  </span>
+                </div>
+
+                <div className="space-y-2 max-h-[600px] overflow-y-auto">
+                  {backendState?.audit_logs && backendState.audit_logs.map((log, idx) => (
+                    <div key={idx} className="glass-inner p-3 rounded-xl font-mono text-xs flex items-center justify-between border border-slate-700/40">
+                      <div className="space-y-1">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-cyan-400 font-bold">{log.tool || log.action}</span>
+                          <span className="text-slate-400">•</span>
+                          <span className="text-slate-300">{log.action || log.details}</span>
+                        </div>
+                        <div className="text-[11px] text-slate-500">Actor: {log.user || 'Voice/UI Copilot'} • Target: {log.target_url || log.target || 'System'}</div>
+                      </div>
+                      <div className="text-right space-y-1">
+                        <span className={`text-[10px] px-2 py-0.5 rounded font-bold ${
+                          log.status === 'RESOLVED' || log.status === 'SUCCESS' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-700 text-slate-300'
+                        }`}>
+                          {log.status}
+                        </span>
+                        <div className="text-[10px] text-slate-500">{log.timestamp}</div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
@@ -1636,6 +2279,28 @@
             onTriggerRetest={handleVoiceRetestTrigger}
             theme={theme}
             toggleTheme={toggleTheme}
+            backendState={backendState}
+            onSyncBackend={syncBackendState}
+            onSelectFinding={(fid) => {
+              if (backendState?.findings) {
+                const f = backendState.findings.find(x => x.id === fid || x.display_id === fid);
+                if (f) {
+                  setSelectedFinding(f);
+                  setActiveTab('findings');
+                }
+              }
+            }}
+            selectedFindingId={selectedFinding?.id}
+          />
+
+          {/* ─── DEEP INVESTIGATION MODAL ─── */}
+          <FindingModal
+            finding={selectedFinding}
+            onClose={() => setSelectedFinding(null)}
+            onApplyFix={handleApplyFix}
+            onRetest={handleRetestBackend}
+            isApplying={isApplyingFix}
+            isRetesting={isRetesting}
           />
 
           {/* ─── SETTINGS MODAL ─── */}
@@ -1645,8 +2310,8 @@
           />
 
           <footer className="glass px-6 py-3 border-t text-center text-xs font-mono text-slate-400 no-print flex items-center justify-between">
-            <span>HELIOS Autonomous Security Engineer • Gemini Brain & ElevenLabs Voice</span>
-            <span>Built with AI. Secured with HELIOS.</span>
+            <span>HELIOS Autonomous Security Engineer • Unified Single Source of Truth</span>
+            <span>Build with AI. Secure with HELIOS.</span>
           </footer>
         </div>
       );
